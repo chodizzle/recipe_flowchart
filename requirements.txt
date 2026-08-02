@@ -1,0 +1,8 @@
+anthropic
+openai
+python-dotenv
+requests
+pillow
+jupyter
+nbconvert
+ipykernel
