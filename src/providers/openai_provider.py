@@ -9,7 +9,15 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from .base import EXTRACTION_INSTRUCTIONS, RECIPE_STEPS_SCHEMA, ExtractionResult, Provider
+from .base import (
+    EXTRACTION_INSTRUCTIONS,
+    RECIPE_GRAPH_SCHEMA,
+    SEED,
+    TEMPERATURE,
+    ExtractionResult,
+    Provider,
+    validate_graph,
+)
 
 # USD per million tokens: (input, output). Standard listed rates, Aug 2026.
 PRICING_PER_MTOK = {
@@ -20,9 +28,9 @@ PRICING_PER_MTOK = {
 _TOOL = {
     "type": "function",
     "function": {
-        "name": "record_recipe_steps",
-        "description": "Record the recipe's structured step breakdown.",
-        "parameters": RECIPE_STEPS_SCHEMA,
+        "name": "record_recipe_graph",
+        "description": "Record the recipe's ingredient/operation dependency graph.",
+        "parameters": RECIPE_GRAPH_SCHEMA,
     },
 }
 
@@ -37,17 +45,21 @@ class OpenAIProvider(Provider):
         start = time.perf_counter()
         response = self._client.chat.completions.create(
             model=model,
+            temperature=TEMPERATURE,
+            seed=SEED,
             messages=[
                 {"role": "system", "content": EXTRACTION_INSTRUCTIONS},
                 {"role": "user", "content": user_content},
             ],
             tools=[_TOOL],
-            tool_choice={"type": "function", "function": {"name": "record_recipe_steps"}},
+            tool_choice={"type": "function", "function": {"name": "record_recipe_graph"}},
         )
         latency = time.perf_counter() - start
 
         tool_call = response.choices[0].message.tool_calls[0]
         data = json.loads(tool_call.function.arguments)
+        nodes = data.get("nodes", [])
+        validate_graph(nodes)
 
         in_rate, out_rate = PRICING_PER_MTOK.get(model, (0.0, 0.0))
         cost = (response.usage.prompt_tokens / 1e6) * in_rate + (
@@ -58,7 +70,7 @@ class OpenAIProvider(Provider):
             provider=self.name,
             model=model,
             title=data.get("title", ""),
-            steps=data.get("steps", []),
+            nodes=nodes,
             input_tokens=response.usage.prompt_tokens,
             output_tokens=response.usage.completion_tokens,
             latency_s=latency,

@@ -6,45 +6,78 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 
-RECIPE_STEPS_SCHEMA = {
+# This is a structuring task, not a creative one -- extraction should be as close to
+# deterministic as each provider's API allows. temperature=0 is supported everywhere;
+# `seed` is a best-effort determinism hint OpenAI and Gemini support and Anthropic doesn't.
+TEMPERATURE = 0.0
+SEED = 0
+
+# Flat node shape (every field present, nullable where type-conditional) rather than a
+# oneOf on `type` -- OpenAI's strict function-calling requires every property listed in
+# `required`, and a flat shape behaves identically across both providers' implementations.
+RECIPE_GRAPH_SCHEMA = {
     "type": "object",
     "properties": {
         "title": {"type": "string", "description": "The recipe's title"},
-        "steps": {
+        "nodes": {
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
-                    "id": {"type": "string", "description": "Short unique step id, e.g. 's1'"},
-                    "text": {"type": "string", "description": "One imperative instruction"},
-                    "duration_min": {
-                        "type": ["number", "null"],
-                        "description": "Active or wait time in minutes, or null if not stated/estimable",
+                    "id": {"type": "string", "description": "Short unique node id, e.g. 'i1' or 'o1'"},
+                    "type": {
+                        "type": "string",
+                        "enum": ["ingredient", "operation"],
+                        "description": "'ingredient' is a raw input (always a layer-0 leaf); 'operation' is a technique applied to earlier nodes",
                     },
-                    "depends_on": {
+                    "name": {
+                        "type": ["string", "null"],
+                        "description": "Ingredient name, e.g. 'unsalted butter'. Null for operation nodes.",
+                    },
+                    "amount": {
+                        "type": ["string", "null"],
+                        "description": "Ingredient quantity as a single string, e.g. '1 cup (200 g)'. Null for operation nodes.",
+                    },
+                    "technique": {
+                        "type": ["string", "null"],
+                        "description": "Short imperative technique label for an operation, e.g. 'melt', 'mix', 'fold in', 'bake'. Null for ingredient nodes.",
+                    },
+                    "inputs": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "IDs of steps that must finish before this one can start. Empty if it can start immediately.",
+                        "description": "IDs of nodes (ingredients and/or upstream operations) this operation consumes. Always empty for ingredient nodes.",
+                    },
+                    "detail": {
+                        "type": ["string", "null"],
+                        "description": "Optional operation detail such as time/temperature, e.g. '350F (170C), 30-40 min'. Null if not applicable.",
                     },
                 },
-                "required": ["id", "text", "duration_min", "depends_on"],
+                "required": ["id", "type", "name", "amount", "technique", "inputs", "detail"],
             },
         },
     },
-    "required": ["title", "steps"],
+    "required": ["title", "nodes"],
 }
 
-EXTRACTION_INSTRUCTIONS = (
-    "You are extracting structured step data from a recipe. Read the recipe "
-    "(text or a photo of one, possibly handwritten and mixing languages) and break it "
-    "into discrete steps. For each step, identify which other steps it depends on "
-    "(depends_on) -- meaning it cannot start until those finish. Steps with no shared "
-    "dependency chain should have no overlapping depends_on so they read as independent "
-    "and can run in parallel (e.g. 'boil pasta' and 'make sauce' are usually independent "
-    "until a step that combines them). Keep step text short and imperative. Use "
-    "duration_min for stated or clearly implied active/wait times; use null if not "
-    "stated. Assign short sequential ids like s1, s2, ..."
-)
+EXTRACTION_INSTRUCTIONS = """You are extracting a recipe into a Gozinto-style dependency graph (an assembly chart: ingredients converge through operations into a finished dish).
+
+First, set `title` to the dish's name -- its own stated title if given, otherwise a short accurate one you infer. This field is required and must never be left blank or omitted, no matter how long the node list below ends up being.
+
+Then read the recipe -- text or a photo, possibly handwritten and mixing languages -- and emit a flat list of nodes of two kinds:
+
+- ingredient nodes: one per line item (name + amount), always a layer-0 leaf with no inputs. Never merge multiple ingredients into one node.
+- operation nodes: a short technique label (e.g. "melt", "mix", "fold in", "bake", not a full sentence) plus `inputs`, the ids of every node -- ingredients and/or earlier operations -- that this step consumes. `inputs` points BACKWARD at what feeds in, never forward. A non-ingredient setup action with nothing feeding into it yet (e.g. "preheat oven", "butter the pan") is still an operation node, just with an empty `inputs` list.
+
+Order falls out of the graph itself (an operation's depth is 1 + the deepest of its inputs), so do not number steps or encode order any other way. Use `detail` for a stated time/temperature; leave it null otherwise.
+
+Worked example -- input "Toast: 2 slices bread. Butter: 1 tbsp. Toast the bread. Spread the butter on the toast." produces title "Toast" and exactly these nodes:
+
+  {"id": "i1", "type": "ingredient", "name": "bread", "amount": "2 slices", "technique": null, "inputs": [], "detail": null}
+  {"id": "i2", "type": "ingredient", "name": "butter", "amount": "1 tbsp", "technique": null, "inputs": [], "detail": null}
+  {"id": "o1", "type": "operation", "name": null, "amount": null, "technique": "toast", "inputs": ["i1"], "detail": null}
+  {"id": "o2", "type": "operation", "name": null, "amount": null, "technique": "spread", "inputs": ["o1", "i2"], "detail": null}
+
+Note how "spread" reaches back to both the toasted bread (o1) and the raw butter (i2) -- that convergence is exactly what `inputs` is for. Assign short sequential ids: i1, i2, ... for ingredients, o1, o2, ... for operations."""
 
 
 @dataclass
@@ -52,11 +85,46 @@ class ExtractionResult:
     provider: str
     model: str
     title: str
-    steps: list[dict]
+    nodes: list[dict]
     input_tokens: int
     output_tokens: int
     latency_s: float
     estimated_cost_usd: float
+
+
+class GraphValidationError(ValueError):
+    """A model's node list doesn't form a valid dependency graph."""
+
+
+def validate_graph(nodes: list[dict]) -> None:
+    """Every `inputs` id must resolve to a node that exists, and the graph must be acyclic."""
+    ids = {n["id"] for n in nodes}
+    if len(ids) != len(nodes):
+        raise GraphValidationError("duplicate node ids in extraction result")
+
+    for node in nodes:
+        for dep in node.get("inputs") or []:
+            if dep not in ids:
+                raise GraphValidationError(f"node {node['id']!r} has unresolved input {dep!r}")
+
+    # DFS cycle check over the inputs (dependency) edges.
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = {n["id"]: WHITE for n in nodes}
+    by_node_id = {n["id"]: n for n in nodes}
+
+    def visit(node_id: str, path: list[str]) -> None:
+        color[node_id] = GRAY
+        for dep in by_node_id[node_id].get("inputs") or []:
+            if color[dep] == GRAY:
+                cycle = " -> ".join(path + [dep])
+                raise GraphValidationError(f"cycle detected: {cycle}")
+            if color[dep] == WHITE:
+                visit(dep, path + [dep])
+        color[node_id] = BLACK
+
+    for node in nodes:
+        if color[node["id"]] == WHITE:
+            visit(node["id"], [node["id"]])
 
 
 class Provider(ABC):

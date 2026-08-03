@@ -8,7 +8,14 @@ from pathlib import Path
 
 import anthropic
 
-from .base import EXTRACTION_INSTRUCTIONS, RECIPE_STEPS_SCHEMA, ExtractionResult, Provider
+from .base import (
+    EXTRACTION_INSTRUCTIONS,
+    RECIPE_GRAPH_SCHEMA,
+    TEMPERATURE,
+    ExtractionResult,
+    Provider,
+    validate_graph,
+)
 
 # USD per million tokens: (input, output). Standard listed rates.
 PRICING_PER_MTOK = {
@@ -17,9 +24,9 @@ PRICING_PER_MTOK = {
 }
 
 _TOOL = {
-    "name": "record_recipe_steps",
-    "description": "Record the recipe's structured step breakdown.",
-    "input_schema": RECIPE_STEPS_SCHEMA,
+    "name": "record_recipe_graph",
+    "description": "Record the recipe's ingredient/operation dependency graph.",
+    "input_schema": RECIPE_GRAPH_SCHEMA,
 }
 
 
@@ -30,19 +37,29 @@ class AnthropicProvider(Provider):
         self._client = anthropic.Anthropic(api_key=api_key)
 
     def _call(self, model: str, content: str | list[dict]) -> ExtractionResult:
-        start = time.perf_counter()
-        response = self._client.messages.create(
+        kwargs = dict(
             model=model,
             max_tokens=4096,
             system=EXTRACTION_INSTRUCTIONS,
             tools=[_TOOL],
-            tool_choice={"type": "tool", "name": "record_recipe_steps"},
+            tool_choice={"type": "tool", "name": "record_recipe_graph"},
             messages=[{"role": "user", "content": content}],
         )
+        start = time.perf_counter()
+        try:
+            # Not every current model accepts an explicit temperature (e.g. claude-sonnet-5
+            # 400s with "temperature is deprecated for this model") -- fall back without it.
+            response = self._client.messages.create(temperature=TEMPERATURE, **kwargs)
+        except anthropic.BadRequestError as e:
+            if "temperature" not in str(e):
+                raise
+            response = self._client.messages.create(**kwargs)
         latency = time.perf_counter() - start
 
         tool_use = next(b for b in response.content if b.type == "tool_use")
         data = tool_use.input
+        nodes = data.get("nodes", [])
+        validate_graph(nodes)
 
         in_rate, out_rate = PRICING_PER_MTOK.get(model, (0.0, 0.0))
         cost = (response.usage.input_tokens / 1e6) * in_rate + (
@@ -53,7 +70,7 @@ class AnthropicProvider(Provider):
             provider=self.name,
             model=model,
             title=data.get("title", ""),
-            steps=data.get("steps", []),
+            nodes=nodes,
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
             latency_s=latency,

@@ -47,11 +47,20 @@
     margin: 1.6rem 0;
     overflow-x: auto;
   }
-  pre.mermaid { background: var(--bg); border-radius: 8px; padding: 0.5rem; overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; margin-top: 1rem; font-size: 0.88rem; }
-  th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); }
-  th { color: var(--muted); font-weight: 600; }
-  tr.primary td { font-weight: 600; }
+  table.gozinto { border-collapse: collapse; width: 100%; margin-top: 0.5rem; font-size: 0.9rem; }
+  table.gozinto td { border: 1px solid var(--border); padding: 0.55rem 0.75rem; vertical-align: middle; }
+  table.gozinto td.ingredient { background: var(--bg); }
+  table.gozinto td.ingredient .name { display: block; font-weight: 600; }
+  table.gozinto td.ingredient .amount { display: block; color: var(--muted); font-size: 0.85em; }
+  table.gozinto td.op { background: var(--card); border-left: 4px solid var(--accent2); border-radius: 0 8px 8px 0; text-align: center; }
+  table.gozinto td.op .technique { display: block; font-weight: 600; text-transform: capitalize; }
+  table.gozinto td.op .detail { display: block; color: var(--muted); font-size: 0.8em; margin-top: 0.15rem; }
+  table.gozinto td.empty { border-color: transparent; background: transparent; }
+  table.gozinto td.setup { background: var(--code-bg); font-weight: 600; text-align: left; border-left: 4px solid var(--accent); }
+  table.stats { border-collapse: collapse; width: 100%; margin-top: 1.4rem; font-size: 0.88rem; }
+  table.stats th, table.stats td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); }
+  table.stats th { color: var(--muted); font-weight: 600; }
+  table.stats tr.primary td { font-weight: 600; }
   a { color: var(--accent2); }
   code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9em; }
   footer { margin-top: 3rem; color: var(--muted); font-size: 0.85rem; }
@@ -61,123 +70,114 @@
 <main>
   <h1>Recipe Flowchart</h1>
   <p class="tagline">Turning recipes into dependency graphs -- and testing how cheap a model can be while still getting the graph right.</p>
-  <p>Structuring unstructured text used to mean regex and endless if-chains. LLMs are now good enough, and cheap enough, to do it directly: each recipe below was run through the same forced-JSON extraction across four models, from a $1/MTok model up to full-price flagships, so the comparison table shows what you actually pay for accuracy versus what you don't.</p>
+  <p>Structuring unstructured text used to mean regex and endless if-chains. LLMs are now good enough, and cheap enough, to do it directly: each recipe below was run through the same forced-JSON extraction across six models from three providers, so the comparison table shows what you actually pay for accuracy versus what you don't.</p>
 
 
   <section class="card">
-    <h2>Cooked: </h2>
+    <h2>Cooked: Chinese Sweet and Sour Pork</h2>
     <p class="tagline">Source: Serious Eats</p>
-    <pre class="mermaid">
-graph TD
-    s1[&quot;Whisk marinade ingredients and coat pork; let sit 15 min to 2 hr (15 min)&quot;]
-    s2[&quot;Whisk dredge ingredients with 3 tbsp marinade until clumpy (5 min)&quot;]
-    s3[&quot;Press marinated pork into dredge to coat (10 min)&quot;]
-    s4[&quot;Heat oil to 325°F and fry pork first time until set, ~2 min per batch (10 min)&quot;]
-    s5[&quot;Increase oil to 375°F and fry pork again until golden and crisp (8 min)&quot;]
-    s6[&quot;Fry bell peppers and pineapple until slightly softened and blistered (1 min)&quot;]
-    s7[&quot;Pour off oil, reserve 1 tbsp; whisk and cook sauce ingredients until bubbling (5 min)&quot;]
-    s8[&quot;Make cornstarch slurry and stir into sauce until thickened (1 min)&quot;]
-    s9[&quot;Add fried pork, peppers, and pineapple to sauce; toss to coat and serve (2 min)&quot;]
-    s1 --&gt; s2
-    s2 --&gt; s3
-    s3 --&gt; s4
-    s4 --&gt; s5
-    s5 --&gt; s6
-    s7 --&gt; s8
-    s8 --&gt; s9
-    s6 --&gt; s9
-    </pre>
-    <table>
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Steps</th><th>Independent</th></tr></thead>
+    <table class="gozinto">
+<tbody>
+<tr><td class="ingredient"><span class="name">pork tenderloin</span><span class="amount">12 ounces (340 g), cubed</span></td><td class="empty"></td><td rowspan="8" class="op"><span class="technique">marinate pork</span><span class="detail">at least 15 min, up to 2 hr refrigerated</span></td><td rowspan="11" class="op"><span class="technique">clump dredge with marinade</span></td><td rowspan="11" class="op"><span class="technique">coat pork in dredge</span></td><td rowspan="12" class="op"><span class="technique">fry (first pass)</span><span class="detail">about 2 min per batch</span></td><td rowspan="12" class="op"><span class="technique">fry (second pass)</span><span class="detail">1 to 1.5 min per batch</span></td><td rowspan="15" class="op"><span class="technique">reserve oil</span></td><td rowspan="20" class="op"><span class="technique">cook sauce</span><span class="detail">until bubbling</span></td><td rowspan="21" class="op"><span class="technique">thicken sauce</span><span class="detail">about 30 sec</span></td><td rowspan="21" class="op"><span class="technique">toss to coat</span></td></tr>
+<tr><td class="ingredient"><span class="name">Shaoxing wine</span><span class="amount">2 tablespoons (30 ml)</span></td><td rowspan="7" class="op"><span class="technique">whisk marinade</span></td></tr>
+<tr><td class="ingredient"><span class="name">egg plus egg white</span><span class="amount">1 large egg plus 1 egg white</span></td></tr>
+<tr><td class="ingredient"><span class="name">baking soda</span><span class="amount">1/4 teaspoon</span></td></tr>
+<tr><td class="ingredient"><span class="name">ground white pepper</span><span class="amount">1/8 teaspoon</span></td></tr>
+<tr><td class="ingredient"><span class="name">neutral oil (marinade)</span><span class="amount">1 tablespoon (15 ml)</span></td></tr>
+<tr><td class="ingredient"><span class="name">potato starch (marinade)</span><span class="amount">2 teaspoons</span></td></tr>
+<tr><td class="ingredient"><span class="name">kosher salt (marinade)</span><span class="amount">1/2 teaspoon</span></td></tr>
+<tr><td class="ingredient"><span class="name">potato starch (dredge)</span><span class="amount">1/2 cup plus 2 tablespoons</span></td><td rowspan="3" class="op"><span class="technique">whisk dredge</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">baking powder (dredge)</span><span class="amount">1/4 teaspoon</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">kosher salt (dredge)</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">neutral oil, for frying</span><span class="amount">4 cups</span></td><td class="op"><span class="technique">heat oil</span><span class="detail">325°F (165°C)</span></td><td class="op"><span class="technique">increase oil temp</span><span class="detail">375°F (190°C)</span></td><td rowspan="4" class="op"><span class="technique">fry peppers and pineapple</span><span class="detail">about 1 min</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">pineapple</span><span class="amount">170 g, peeled, cored, cut into 1-inch pieces</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">green bell pepper</span><span class="amount">1/2 large, cut into 1-inch pieces</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">red bell pepper</span><span class="amount">1/2 large, cut into 1-inch pieces</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">ketchup</span><span class="amount">5 tablespoons</span></td><td rowspan="5" class="op"><span class="technique">whisk sauce base</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">distilled white vinegar</span><span class="amount">2 tablespoons</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">water (sauce)</span><span class="amount">3 tablespoons, divided</span></td><td rowspan="4" class="op"><span class="technique">make slurry</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">granulated sugar</span><span class="amount">2 tablespoons plus 1 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">kosher salt (sauce)</span><span class="amount">1/4 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">cornstarch (sauce)</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">white rice, for serving</span><span class="amount">optional</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+</tbody>
+</table>
+    <table class="stats">
+      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
       <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>1956</td><td>1265</td><td>$0.0083</td><td>5.8s</td><td>17</td><td>5</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>2274</td><td>541</td><td>$0.0149</td><td>5.2s</td><td>9</td><td>2</td></tr>
-        <tr><td>GPT-4o mini</td><td>1011</td><td>554</td><td>$0.0005</td><td>6.8s</td><td>9</td><td>1</td></tr>
-        <tr><td>GPT-4o</td><td>1011</td><td>356</td><td>$0.0061</td><td>3.0s</td><td>10</td><td>2</td></tr>
+        <tr><td>Claude Haiku 4.5</td><td>2608</td><td>2114</td><td>$0.0132</td><td>12.8s</td><td>23</td><td>15</td><td>13</td></tr>
+        <tr class="primary"><td>Claude Sonnet 5</td><td>3174</td><td>2403</td><td>$0.0456</td><td>15.7s</td><td>22</td><td>16</td><td>14</td></tr>
+        <tr><td>GPT-4o mini</td><td>1577</td><td>1305</td><td>$0.0010</td><td>12.2s</td><td>24</td><td>9</td><td>6</td></tr>
+        <tr><td>GPT-4o</td><td>1577</td><td>1587</td><td>$0.0198</td><td>8.6s</td><td>22</td><td>17</td><td>13</td></tr>
+        <tr><td>Gemini 3.5 Flash-Lite</td><td>1772</td><td>1878</td><td>$0.0052</td><td>4.7s</td><td>21</td><td>15</td><td>13</td></tr>
+        <tr><td>Gemini 3.5 Flash</td><td>1772</td><td>2001</td><td>$0.0207</td><td>18.8s</td><td>22</td><td>14</td><td>12</td></tr>
       </tbody>
     </table>
   </section>
 
   <section class="card">
-    <h2>Baked: </h2>
+    <h2>Baked: Spinach Egg Bites</h2>
     <p class="tagline">Source: NYT Cooking</p>
-    <pre class="mermaid">
-graph TD
-    s1[&quot;Heat oven to 375°F, rack in center&quot;]
-    s2[&quot;Grease muffin tin with olive oil, place on sheet pan&quot;]
-    s3[&quot;Squeeze thawed spinach dry over sink&quot;]
-    s4[&quot;Combine spinach, scallions, eggs, cottage cheese, Parmesan, nutmeg, salt, pepper in a bowl&quot;]
-    s5[&quot;Stir in flour and baking powder until just incorporated&quot;]
-    s6[&quot;Fill muffin tin with spinach mixture, about 1/3 cup each&quot;]
-    s7[&quot;Bake until set (22 min)&quot;]
-    s8[&quot;Cool completely&quot;]
-    s9[&quot;Run paring knife around edges to release bites&quot;]
-    s3 --&gt; s4
-    s4 --&gt; s5
-    s1 --&gt; s6
-    s2 --&gt; s6
-    s5 --&gt; s6
-    s6 --&gt; s7
-    s7 --&gt; s8
-    s8 --&gt; s9
-    </pre>
-    <table>
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Steps</th><th>Independent</th></tr></thead>
+    <table class="gozinto">
+<tbody>
+<tr><td colspan="8" class="setup">preheat oven &mdash; 375 degrees</td></tr>
+<tr><td class="ingredient"><span class="name">olive oil</span><span class="amount">for greasing</span></td><td class="op"><span class="technique">grease muffin tin</span></td><td class="empty"></td><td class="empty"></td><td rowspan="11" class="op"><span class="technique">fill muffin tin</span><span class="detail">about 1/3 cup each</span></td><td rowspan="11" class="op"><span class="technique">bake</span><span class="detail">20-25 min, until set</span></td><td rowspan="11" class="op"><span class="technique">cool</span></td><td rowspan="11" class="op"><span class="technique">release from tin</span></td></tr>
+<tr><td class="ingredient"><span class="name">frozen chopped spinach, thawed</span><span class="amount">2 (10-ounce) packages</span></td><td class="op"><span class="technique">squeeze water out</span></td><td rowspan="8" class="op"><span class="technique">combine</span></td><td rowspan="10" class="op"><span class="technique">stir in</span></td></tr>
+<tr><td class="ingredient"><span class="name">scallions, thinly sliced crosswise</span><span class="amount">4</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">large eggs</span><span class="amount">6</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">cottage cheese</span><span class="amount">2 cups (16 ounces)</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">grated Parmesan</span><span class="amount">1/4 cup</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">ground nutmeg</span><span class="amount">pinch</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">salt</span><span class="amount">to taste</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">freshly ground black pepper</span><span class="amount">to taste</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">all-purpose flour</span><span class="amount">6 tablespoons</span></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">baking powder</span><span class="amount">1 teaspoon</span></td><td class="empty"></td><td class="empty"></td></tr>
+</tbody>
+</table>
+    <table class="stats">
+      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
       <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>1323</td><td>582</td><td>$0.0042</td><td>2.8s</td><td>9</td><td>2</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>1455</td><td>472</td><td>$0.0114</td><td>3.9s</td><td>9</td><td>3</td></tr>
-        <tr><td>GPT-4o mini</td><td>544</td><td>246</td><td>$0.0002</td><td>2.4s</td><td>7</td><td>1</td></tr>
-        <tr><td>GPT-4o</td><td>544</td><td>265</td><td>$0.0040</td><td>2.3s</td><td>8</td><td>2</td></tr>
+        <tr><td>Claude Haiku 4.5</td><td>1975</td><td>1100</td><td>$0.0075</td><td>6.2s</td><td>11</td><td>10</td><td>4</td></tr>
+        <tr class="primary"><td>Claude Sonnet 5</td><td>2355</td><td>1161</td><td>$0.0245</td><td>8.1s</td><td>11</td><td>9</td><td>4</td></tr>
+        <tr><td>GPT-4o mini</td><td>1110</td><td>675</td><td>$0.0006</td><td>6.3s</td><td>11</td><td>8</td><td>1</td></tr>
+        <tr><td>GPT-4o</td><td>1110</td><td>612</td><td>$0.0089</td><td>3.6s</td><td>10</td><td>7</td><td>2</td></tr>
+        <tr><td>Gemini 3.5 Flash-Lite</td><td>1275</td><td>873</td><td>$0.0026</td><td>2.6s</td><td>10</td><td>8</td><td>4</td></tr>
+        <tr><td>Gemini 3.5 Flash</td><td>1275</td><td>879</td><td>$0.0098</td><td>42.2s</td><td>10</td><td>8</td><td>4</td></tr>
       </tbody>
     </table>
   </section>
 
   <section class="card">
-    <h2>Handwritten: </h2>
+    <h2>Handwritten: Choux au Craquelin</h2>
     <p class="tagline">Source: My own kitchen notes (bilingual shorthand, hand-drawn dependency brackets)</p>
-    <pre class="mermaid">
-graph TD
-    s1[&quot;Cream brown sugar, butter, AP flour, and salt until crumbly&quot;]
-    s2[&quot;Press craquelin dough into 6x8 rectangle&quot;]
-    s3[&quot;Roll craquelin out to 12x14 inches, 1/8 inch thick&quot;]
-    s4[&quot;Freeze craquelin sheet for 5 minutes (5 min)&quot;]
-    s5[&quot;Cut craquelin into 18 rounds of 2 inches&quot;]
-    s6[&quot;Combine water, butter, sugar, and salt and boil to make panade&quot;]
-    s7[&quot;Add AP flour to panade and cook to 170F&quot;]
-    s8[&quot;Cool panade&quot;]
-    s9[&quot;Mix cooled panade with eggs to form choux dough&quot;]
-    s10[&quot;Pipe choux dough and top with craquelin rounds&quot;]
-    s11[&quot;Bake at 400F for 10-12 minutes (12 min)&quot;]
-    s12[&quot;Turn oven off, open door, and let sit 30 minutes (30 min)&quot;]
-    s1 --&gt; s2
-    s2 --&gt; s3
-    s3 --&gt; s4
-    s4 --&gt; s5
-    s6 --&gt; s7
-    s7 --&gt; s8
-    s8 --&gt; s9
-    s5 --&gt; s10
-    s9 --&gt; s10
-    s10 --&gt; s11
-    s11 --&gt; s12
-    </pre>
-    <table>
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Steps</th><th>Independent</th></tr></thead>
+    <table class="gozinto">
+<tbody>
+<tr><td class="ingredient"><span class="name">brown sugar</span><span class="amount">115g</span></td><td rowspan="2" class="op"><span class="technique">cream</span></td><td rowspan="4" class="op"><span class="technique">combine until crumbly</span></td><td rowspan="4" class="op"><span class="technique">press into rectangle</span><span class="detail">6x8 rectangle</span></td><td rowspan="4" class="op"><span class="technique">roll out and freeze</span><span class="detail">12x14, 1/8&quot;, freeze 5 min</span></td><td rowspan="4" class="op"><span class="technique">cut rounds</span><span class="detail">18x 2&quot; rounds</span></td><td rowspan="10" class="op"><span class="technique">top with craquelin round and bake</span><span class="detail">400F 10-12 min</span></td><td rowspan="10" class="op"><span class="technique">rest with oven off and door open</span><span class="detail">30 min</span></td></tr>
+<tr><td class="ingredient"><span class="name">butter</span><span class="amount">115g</span></td></tr>
+<tr><td class="ingredient"><span class="name">AP flour</span><span class="amount">115g</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">salt</span><span class="amount">1/8 tsp</span></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">water</span><span class="amount">235g</span></td><td rowspan="5" class="op"><span class="technique">boil panade</span><span class="detail">170F</span></td><td rowspan="5" class="op"><span class="technique">cool</span></td><td rowspan="6" class="op"><span class="technique">mix in eggs</span></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">butter</span><span class="amount">84g</span></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">sugar</span><span class="amount">8g</span></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">salt</span><span class="amount">2g</span></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">AP flour</span><span class="amount">128g</span></td><td class="empty"></td><td class="empty"></td></tr>
+<tr><td class="ingredient"><span class="name">eggs</span><span class="amount">4 large</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+</tbody>
+</table>
+    <table class="stats">
+      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
       <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>2557</td><td>549</td><td>$0.0053</td><td>5.0s</td><td>7</td><td>2</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>2994</td><td>674</td><td>$0.0191</td><td>6.0s</td><td>12</td><td>2</td></tr>
-        <tr><td>GPT-4o mini</td><td>37124</td><td>304</td><td>$0.0058</td><td>4.4s</td><td>9</td><td>2</td></tr>
-        <tr><td>GPT-4o</td><td>1394</td><td>261</td><td>$0.0061</td><td>3.1s</td><td>6</td><td>2</td></tr>
+        <tr><td>Claude Haiku 4.5</td><td>3209</td><td>959</td><td>$0.0080</td><td>5.9s</td><td>10</td><td>9</td><td>5</td></tr>
+        <tr class="primary"><td>Claude Sonnet 5</td><td>3894</td><td>1237</td><td>$0.0302</td><td>10.9s</td><td>10</td><td>10</td><td>5</td></tr>
+        <tr><td>GPT-4o mini</td><td>37690</td><td>529</td><td>$0.0060</td><td>7.6s</td><td>10</td><td>5</td><td>3</td></tr>
+        <tr><td>GPT-4o</td><td>1960</td><td>609</td><td>$0.0110</td><td>4.4s</td><td>10</td><td>7</td><td>3</td></tr>
+        <tr><td>Gemini 3.5 Flash-Lite</td><td>2092</td><td>758</td><td>$0.0025</td><td>2.5s</td><td>10</td><td>5</td><td>4</td></tr>
+        <tr><td>Gemini 3.5 Flash</td><td>2092</td><td>908</td><td>$0.0113</td><td>31.5s</td><td>10</td><td>9</td><td>5</td></tr>
       </tbody>
     </table>
   </section>
 
   <footer>Full pipeline, provider code, and example recipes: <a href="https://github.com/chodizzle/recipe_flowchart">github.com/chodizzle/recipe_flowchart</a>.</footer>
 </main>
-<script type="module">
-  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
-  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  mermaid.initialize({ startOnLoad: true, theme: dark ? "dark" : "neutral" });
-</script>
 </body>
 </html>
