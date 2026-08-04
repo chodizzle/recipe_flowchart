@@ -1,0 +1,21 @@
+{
+  "run_id": "complex__openai-gpt-4o-mini",
+  "cell_flags": {
+    "o1": [
+      "grouping"
+    ],
+    "i4": [
+      "decomposition"
+    ],
+    "o2": [
+      "method",
+      "grouping"
+    ],
+    "o3": [
+      "grouping"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-04T00:54:13.652969+00:00"
+}

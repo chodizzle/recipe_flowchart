@@ -1,0 +1,26 @@
+{
+  "run_id": "cooked__openai-gpt-4o-mini",
+  "cell_flags": {
+    "o6": [
+      "order"
+    ],
+    "i20": [
+      "decomposition"
+    ],
+    "o7": [
+      "order"
+    ],
+    "o8": [
+      "order"
+    ],
+    "o1": [
+      "grouping"
+    ],
+    "o3": [
+      "grouping"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-04T01:44:05.415308+00:00"
+}

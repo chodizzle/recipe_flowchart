@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gozinto eval &mdash; {{ run.recipe_label }} / {{ run.model_label }}</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a1a; --muted: #5a5a5a;
+    --card: #f6f6f7; --border: #e2e2e4; --accent: #b3261e; --accent2: #1a7f37;
+    --code-bg: #f0f0f1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12141a; --fg: #e8e8ea; --muted: #a2a3aa;
+      --card: #1b1e26; --border: #2b2e38; --accent: #ff7a70; --accent2: #5fd38a;
+      --code-bg: #1d2029;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+  }
+  main { max-width: 1400px; margin: 0 auto; padding: 1.2rem 1.5rem 4rem; }
+
+  .navbar {
+    display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
+    padding: 0.7rem 0; border-bottom: 1px solid var(--border); margin-bottom: 1rem;
+  }
+  .navbar a.navbtn, .navbar button {
+    background: var(--card); border: 1px solid var(--border); color: var(--fg);
+    padding: 0.35rem 0.7rem; border-radius: 6px; text-decoration: none; cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .navbar select { padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--card); color: var(--fg); max-width: 320px; }
+  .navbar .progress { color: var(--muted); font-size: 0.88rem; margin-left: auto; }
+  .navbar .reviewed-btn.on { background: var(--accent2); color: #08260f; border-color: var(--accent2); }
+
+  .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+
+  .pane { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
+  .pane h2 { margin: 0 0 0.6rem; font-size: 1.05rem; }
+  .pane .source-line { color: var(--muted); font-size: 0.85rem; margin: 0 0 0.8rem; }
+  .pane pre { white-space: pre-wrap; font-size: 0.88rem; margin: 0; font-family: inherit; }
+  .pane img { max-width: 100%; border-radius: 6px; border: 1px solid var(--border); }
+
+  /* Diff-checker layout: each pane is its own fixed-height scroll box, independent of
+     the other, so a long recipe and a wide table don't force you to scroll the whole
+     page just to keep both in view at once. Narrow screens fall back to normal document
+     flow, since splitting a phone-height viewport into two half-height boxes is worse. */
+  @media (min-width: 901px) {
+    html, body { height: 100%; overflow: hidden; }
+    main { display: flex; flex-direction: column; height: 100vh; padding-bottom: 1.2rem; }
+    .navbar { flex: 0 0 auto; }
+    .panes { flex: 1 1 auto; min-height: 0; }
+    .pane { min-height: 0; overflow-y: auto; }
+  }
+  @media (max-width: 900px) { .panes { grid-template-columns: 1fr; } }
+
+  table.gozinto { border-collapse: collapse; width: 100%; margin-top: 0.3rem; font-size: 0.85rem; }
+  table.gozinto td { border: 1px solid var(--border); padding: 0.5rem 0.65rem; vertical-align: middle; cursor: default; position: relative; }
+  table.gozinto td[data-node-id] { cursor: pointer; }
+  table.gozinto td[data-node-id]:hover { outline: 1px dashed var(--muted); outline-offset: -1px; }
+  table.gozinto td.ingredient { background: var(--bg); }
+  table.gozinto td.ingredient .name { display: block; font-weight: 600; }
+  table.gozinto td.ingredient .amount { display: block; color: var(--muted); font-size: 0.85em; }
+  table.gozinto td.op { background: var(--card); border-left: 4px solid var(--accent2); border-radius: 0 8px 8px 0; text-align: center; }
+  table.gozinto td.op .technique { display: block; font-weight: 600; text-transform: capitalize; }
+  table.gozinto td.op .detail { display: block; color: var(--muted); font-size: 0.8em; margin-top: 0.15rem; }
+  table.gozinto td.empty { border-color: transparent; background: transparent; cursor: default; }
+  table.gozinto td.setup { background: var(--code-bg); font-weight: 600; text-align: left; border-left: 4px solid var(--accent); }
+
+  table.gozinto td[data-flagged] { outline: 3px solid #ef4444; outline-offset: -3px; }
+  table.gozinto td .flag-badges {
+    position: absolute; top: 2px; right: 2px; display: flex; flex-direction: column;
+    gap: 2px; align-items: flex-end;
+  }
+  table.gozinto td .flag-badges .badge {
+    font-size: 0.62rem; font-weight: 700; color: #fff; padding: 0.05rem 0.32rem;
+    border-radius: 4px; text-transform: uppercase; white-space: nowrap;
+  }
+
+  #popover button.active { background: var(--card); }
+  #popover button .check { width: 1rem; flex-shrink: 0; }
+  #popover .node-info {
+    font-size: 0.78rem; color: var(--muted); padding: 0.3rem 0.5rem 0.5rem;
+    border-bottom: 1px solid var(--border); margin-bottom: 0.3rem; line-height: 1.4;
+  }
+  #popover .node-info b { color: var(--fg); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; margin: 0.8rem 0 0.2rem; font-size: 0.78rem; color: var(--muted); }
+  .legend span.swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 3px; margin-right: 0.3rem; vertical-align: -1px; }
+
+  .missing-list { margin-top: 1.2rem; border-top: 1px solid var(--border); padding-top: 0.8rem; }
+  .missing-list h3 { font-size: 0.9rem; margin: 0 0 0.5rem; color: var(--muted); }
+  .missing-list label { display: block; font-size: 0.9rem; margin-bottom: 0.35rem; cursor: pointer; }
+
+  #popover {
+    position: fixed; display: none; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,0.25); padding: 0.4rem; z-index: 50;
+    min-width: 220px;
+  }
+  #popover button {
+    display: flex; width: 100%; align-items: center; gap: 0.5rem; text-align: left;
+    background: transparent; border: none; color: var(--fg); padding: 0.4rem 0.5rem;
+    border-radius: 5px; cursor: pointer; font-size: 0.85rem;
+  }
+  #popover button:hover { background: var(--card); }
+  #popover button .dot { width: 0.65rem; height: 0.65rem; border-radius: 50%; flex-shrink: 0; }
+  #popover button.clear { color: var(--muted); border-top: 1px solid var(--border); margin-top: 0.2rem; padding-top: 0.5rem; }
+</style>
+</head>
+<body>
+<main>
+  <div class="navbar">
+    {% if idx > 0 %}<a class="navbtn" href="/run/{{ idx - 1 }}">&larr; prev</a>{% endif %}
+    <select id="run-select" onchange="location.href='/run/' + this.value">
+      {% for r in all_runs %}
+        <option value="{{ loop.index0 }}" {% if loop.index0 == idx %}selected{% endif %}>
+          {{ '✓ ' if reviewed_map.get(r.run_id) else '' }}{{ r.recipe_label }} / {{ r.model_label }}
+        </option>
+      {% endfor %}
+    </select>
+    {% if idx < total - 1 %}<a class="navbtn" href="/run/{{ idx + 1 }}">next &rarr;</a>{% endif %}
+    <button id="reviewed-btn" class="reviewed-btn {{ 'on' if score.reviewed else '' }}" title="Tagging any cell already marks a run reviewed automatically -- this button is only for a run with zero issues, or to reopen one.">{{ '✓ Reviewed (click to reopen)' if score.reviewed else 'No issues -- mark reviewed' }}</button>
+    <span class="progress">Reviewed {{ reviewed_count }}/{{ total }}</span>
+  </div>
+
+  <div class="panes">
+    <div class="pane">
+      <h2>{{ run.recipe_label }}</h2>
+      <p class="source-line">Source: {{ run.recipe_source }}</p>
+      {% if run.is_image %}
+        <img src="/media/{{ run.recipe_id }}" alt="{{ run.recipe_label }} recipe">
+      {% else %}
+        <pre>{{ run.recipe_text }}</pre>
+      {% endif %}
+    </div>
+
+    <div class="pane">
+      <h2>{{ run.title }} &mdash; {{ run.model_label }}</h2>
+      <p class="source-line">Click a cell to tag why it's wrong.</p>
+      {{ run.table_html | safe }}
+
+      <div class="legend">
+        {% for t in taxonomy %}
+          <span><span class="swatch" style="background:{{ t.color }}"></span>{{ t.label }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="missing-list">
+        <h3>Missing / extra (whole-run checklist)</h3>
+        {% for m in missing_checklist %}
+          <label>
+            <input type="checkbox" data-key="{{ m.key }}" {% if score.missing_flags.get(m.key) %}checked{% endif %}>
+            {{ m.label }}
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="popover"></div>
+
+<script>
+  const RUN_ID = {{ run.run_id | tojson }};
+  const TAXONOMY = {{ taxonomy | tojson }};
+  const CELL_FLAGS = {{ score.cell_flags | tojson }};
+  const NODES_BY_ID = Object.fromEntries({{ run.nodes | tojson }}.map(n => [n.id, n]));
+
+  function describeNode(n) {
+    if (!n) return "(unknown node)";
+    return n.type === "ingredient"
+      ? `${n.name || "?"}${n.amount ? " (" + n.amount + ")" : ""}`
+      : `${n.technique || "?"}${n.detail ? " -- " + n.detail : ""}`;
+  }
+
+  const popover = document.getElementById("popover");
+  const cellTags = {}; // node_id -> array of tag keys, kept in sync with the server
+
+  function renderCellFlags(td, tags) {
+    cellTags[td.dataset.nodeId] = tags;
+    const existing = td.querySelector(".flag-badges");
+    if (existing) existing.remove();
+    if (!tags.length) {
+      delete td.dataset.flagged;
+      return;
+    }
+    td.dataset.flagged = "1";
+    const wrap = document.createElement("div");
+    wrap.className = "flag-badges";
+    tags.forEach(key => {
+      const t = TAXONOMY.find(t => t.key === key);
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.style.background = t.color;
+      badge.textContent = t.label.slice(0, 4);
+      wrap.appendChild(badge);
+    });
+    td.appendChild(wrap);
+  }
+
+  // Hydrate saved flags on load.
+  document.querySelectorAll("td[data-node-id]").forEach(td => {
+    renderCellFlags(td, CELL_FLAGS[td.dataset.nodeId] || []);
+  });
+
+  function closePopover() { popover.style.display = "none"; }
+
+  function toggleTag(td, tagKey) {
+    const nodeId = td.dataset.nodeId;
+    const current = cellTags[nodeId] || [];
+    const next = current.includes(tagKey) ? current.filter(k => k !== tagKey) : [...current, tagKey];
+    renderCellFlags(td, next);
+    fetch("/api/flag", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({run_id: RUN_ID, node_id: nodeId, tag: tagKey}),
+    });
+  }
+
+  document.querySelectorAll("td[data-node-id]").forEach(td => {
+    td.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const active = cellTags[td.dataset.nodeId] || [];
+      popover.innerHTML = "";
+
+      const node = NODES_BY_ID[td.dataset.nodeId];
+      const info = document.createElement("div");
+      info.className = "node-info";
+      if (node && node.type === "operation") {
+        const inputLabels = (node.inputs || []).map(id => describeNode(NODES_BY_ID[id]));
+        info.innerHTML = `<b>${describeNode(node)}</b><br>consumes: ${inputLabels.length ? inputLabels.join(", ") : "(nothing -- setup step)"}`;
+      } else if (node) {
+        info.innerHTML = `<b>${describeNode(node)}</b> (ingredient, no inputs)`;
+      }
+      popover.appendChild(info);
+
+      TAXONOMY.forEach(t => {
+        const isActive = active.includes(t.key);
+        const btn = document.createElement("button");
+        btn.className = isActive ? "active" : "";
+        btn.innerHTML = `<span class="check">${isActive ? "&check;" : ""}</span>` +
+          `<span class="dot" style="background:${t.color}"></span>${t.label} ` +
+          `<span style="color:var(--muted); margin-left:auto; font-size:0.75em;">${t.hint}</span>`;
+        btn.addEventListener("click", () => { toggleTag(td, t.key); closePopover(); });
+        popover.appendChild(btn);
+      });
+      // Measure the popover at its real (content-dependent) size before placing it, so
+      // long hint text or a tall taxonomy list can't push it off-screen either edge.
+      const rect = td.getBoundingClientRect();
+      const margin = 8;
+      popover.style.display = "block";
+      popover.style.left = "0px";
+      popover.style.top = "0px";
+      const popRect = popover.getBoundingClientRect();
+
+      let left = Math.min(rect.left, window.innerWidth - popRect.width - margin);
+      left = Math.max(left, margin);
+
+      let top = rect.bottom + 4;
+      if (top + popRect.height > window.innerHeight - margin) {
+        top = rect.top - popRect.height - 4; // no room below -- open above the cell instead
+      }
+      top = Math.max(top, margin);
+
+      popover.style.left = left + "px";
+      popover.style.top = top + "px";
+    });
+  });
+
+  document.addEventListener("click", closePopover);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePopover(); });
+
+  document.querySelectorAll(".missing-list input[type=checkbox]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      fetch("/api/missing", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({run_id: RUN_ID, key: cb.dataset.key, checked: cb.checked}),
+      });
+    });
+  });
+
+  document.getElementById("reviewed-btn").addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    const nowReviewed = !btn.classList.contains("on");
+    fetch("/api/review", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({run_id: RUN_ID, reviewed: nowReviewed}),
+    }).then(() => location.reload());
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "run_id": "complex__openai-gpt-4o",
+  "cell_flags": {
+    "o6": [
+      "prep",
+      "grouping"
+    ],
+    "o1": [
+      "grouping"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-04T00:39:44.353761+00:00"
+}

@@ -1,0 +1,40 @@
+{
+  "run_id": "cooked__anthropic-claude-haiku-4-5",
+  "cell_flags": {
+    "o3": [
+      "grouping"
+    ],
+    "o4": [
+      "extraneous"
+    ],
+    "o6": [
+      "grouping"
+    ],
+    "o8": [
+      "grouping"
+    ],
+    "o7": [
+      "prep"
+    ],
+    "o9": [
+      "prep"
+    ],
+    "o10": [
+      "order"
+    ],
+    "o12": [
+      "grouping"
+    ],
+    "o14": [
+      "grouping"
+    ],
+    "i19": [
+      "decomposition"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": true
+  },
+  "reviewed": true,
+  "updated_at": "2026-08-04T01:22:43.019493+00:00"
+}

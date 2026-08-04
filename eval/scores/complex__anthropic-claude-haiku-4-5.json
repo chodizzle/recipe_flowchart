@@ -1,0 +1,26 @@
+{
+  "run_id": "complex__anthropic-claude-haiku-4-5",
+  "cell_flags": {
+    "i1": [
+      "decomposition"
+    ],
+    "i4": [
+      "decomposition"
+    ],
+    "o1": [
+      "prep",
+      "grouping"
+    ],
+    "o5": [
+      "prep",
+      "grouping"
+    ],
+    "o6": [
+      "prep",
+      "grouping"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-04T00:35:27.699896+00:00"
+}

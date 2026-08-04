@@ -1,0 +1,11 @@
+{
+  "run_id": "baked__google-gemini-3.5-flash-lite",
+  "cell_flags": {
+    "o8": [
+      "method"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-04T01:56:14.183281+00:00"
+}

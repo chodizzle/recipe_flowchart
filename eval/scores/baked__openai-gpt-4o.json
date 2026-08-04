@@ -1,0 +1,13 @@
+{
+  "run_id": "baked__openai-gpt-4o",
+  "cell_flags": {
+    "o3": [
+      "method"
+    ]
+  },
+  "missing_flags": {
+    "missing_operation": true
+  },
+  "reviewed": true,
+  "updated_at": "2026-08-04T01:55:39.557681+00:00"
+}
