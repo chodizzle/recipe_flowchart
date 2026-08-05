@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import copy
 import json
 import time
 from pathlib import Path
@@ -25,12 +26,25 @@ PRICING_PER_MTOK = {
     "gpt-4o": (2.50, 10.00),
 }
 
+
+def _strict_schema(schema: dict) -> dict:
+    """OpenAI's strict structured-output mode -- which actually enforces every
+    `required` field is present, unlike best-effort function calling -- needs
+    `additionalProperties: false` on every object in the schema. RECIPE_GRAPH_SCHEMA
+    is shared with the other providers, so copy rather than mutate it in place."""
+    schema = copy.deepcopy(schema)
+    schema["additionalProperties"] = False
+    schema["properties"]["nodes"]["items"]["additionalProperties"] = False
+    return schema
+
+
 _TOOL = {
     "type": "function",
     "function": {
         "name": "record_recipe_graph",
         "description": "Record the recipe's ingredient/operation dependency graph.",
-        "parameters": RECIPE_GRAPH_SCHEMA,
+        "parameters": _strict_schema(RECIPE_GRAPH_SCHEMA),
+        "strict": True,
     },
 }
 

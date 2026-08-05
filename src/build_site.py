@@ -48,6 +48,55 @@ RECIPES = [
         "source_url": "",
         "input": RECIPES_DIR / "03_choux_au_craquelin.jpg",
     },
+    {
+        "id": "roast_potatoes",
+        "label": "Web Scrape",
+        "source": "Serious Eats (J. Kenji López-Alt)",
+        "source_url": "https://www.seriouseats.com/the-best-roast-potatoes-ever-recipe",
+        "input": RECIPES_DIR / "04_roast_potatoes.txt",
+    },
+    {
+        "id": "pancakes",
+        "label": "Pancakes",
+        "source": "Serious Eats (J. Kenji López-Alt)",
+        "source_url": "",
+        "input": RECIPES_DIR / "05_pancakes.txt",
+    },
+    {
+        "id": "eggnog",
+        "label": "Eggnog",
+        "source": "Alton Brown",
+        "source_url": "",
+        "input": RECIPES_DIR / "06_eggnog.txt",
+    },
+    {
+        "id": "mac_and_cheese",
+        "label": "Mac & Cheese",
+        "source": "Food Network (Alton Brown)",
+        "source_url": "https://www.foodnetwork.com/recipes/alton-brown/stovetop-mac-n-cheese-recipe-1939465",
+        "input": RECIPES_DIR / "07_mac_and_cheese.txt",
+    },
+    {
+        "id": "potstickers",
+        "label": "Potstickers",
+        "source": "Damn Delicious",
+        "source_url": "",
+        "input": RECIPES_DIR / "08_potstickers.txt",
+    },
+    {
+        "id": "shredded_beef",
+        "label": "Shredded Beef Tacos",
+        "source": "RecipeTin Eats (Nagi)",
+        "source_url": "",
+        "input": RECIPES_DIR / "09_mexican_shredded_beef.txt",
+    },
+    {
+        "id": "tikka_masala",
+        "label": "Tikka Masala",
+        "source": "Savory Tooth",
+        "source_url": "",
+        "input": RECIPES_DIR / "10_chicken_tikka_masala.txt",
+    },
 ]
 
 # (provider, model, display label). The last entry drives the displayed diagram.
