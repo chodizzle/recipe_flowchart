@@ -1,0 +1,15 @@
+{
+  "run_id": "baked__google-gemini-3.5-flash-lite",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "o1": [
+      "grouping"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": false,
+    "missing_operation": false
+  },
+  "updated_at": "2026-08-05T00:01:46.140714+00:00"
+}

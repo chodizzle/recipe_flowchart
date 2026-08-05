@@ -1,0 +1,27 @@
+{
+  "run_id": "complex__openai-gpt-4o",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "o2": [
+      "order",
+      "extraneous"
+    ],
+    "o3": [
+      "decomposition"
+    ],
+    "o6": [
+      "decomposition",
+      "method"
+    ],
+    "o7": [
+      "method",
+      "decomposition"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": true,
+    "missing_operation": true
+  },
+  "updated_at": "2026-08-05T00:02:03.884577+00:00"
+}

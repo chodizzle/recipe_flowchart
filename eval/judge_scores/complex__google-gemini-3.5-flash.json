@@ -1,0 +1,20 @@
+{
+  "run_id": "complex__google-gemini-3.5-flash",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "o6": [
+      "grouping",
+      "decomposition"
+    ],
+    "o8": [
+      "extraneous",
+      "ambiguous_source"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": true,
+    "missing_operation": true
+  },
+  "updated_at": "2026-08-05T00:02:11.936243+00:00"
+}

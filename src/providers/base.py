@@ -77,7 +77,17 @@ Worked example -- input "Toast: 2 slices bread. Butter: 1 tbsp. Toast the bread.
   {"id": "o1", "type": "operation", "name": null, "amount": null, "technique": "toast", "inputs": ["i1"], "detail": null}
   {"id": "o2", "type": "operation", "name": null, "amount": null, "technique": "spread", "inputs": ["o1", "i2"], "detail": null}
 
-Note how "spread" reaches back to both the toasted bread (o1) and the raw butter (i2) -- that convergence is exactly what `inputs` is for. Assign short sequential ids: i1, i2, ... for ingredients, o1, o2, ... for operations."""
+Note how "spread" reaches back to both the toasted bread (o1) and the raw butter (i2) -- that convergence is exactly what `inputs` is for. Assign short sequential ids: i1, i2, ... for ingredients, o1, o2, ... for operations.
+
+A temperature or heat-level statement on its own ("heat oil to 325F", "increase the heat to 375F") is never its own operation node -- fold it into the `detail` of whichever operation actually happens at that temperature. And regardless of temperature: reusing the same piece of equipment or resource (pan, oven, oil, wok) is a real dependency even when no ingredient is shared -- that operation's `inputs` must include whatever earlier operation last used the same resource, so operations end up chained in the order they actually happen, not just the order their own ingredients happen to be ready.
+
+Second worked example -- input "Heat oil to 325F. Fry the pork, 2 min. Increase oil to 375F. Fry the pork again, 1 min. Add the peppers to the hot oil and fry, 1 min." (pork and peppers as ingredient nodes i1, i2) produces:
+
+  {"id": "o1", "type": "operation", "name": null, "amount": null, "technique": "fry", "inputs": ["i1"], "detail": "325F (165C), 2 min"}
+  {"id": "o2", "type": "operation", "name": null, "amount": null, "technique": "fry", "inputs": ["o1"], "detail": "375F (190C), 1 min"}
+  {"id": "o3", "type": "operation", "name": null, "amount": null, "technique": "fry", "inputs": ["o2", "i2"], "detail": "1 min"}
+
+Note "increase oil to 375F" is not its own node -- it's folded into o2's detail, and o2 still depends on o1 since it's the same oil, already in use. Note o3 (frying the peppers) depends on o2, not just on the peppers -- it reuses the same hot oil right after, so it must come after, even though nothing about the peppers themselves required that order."""
 
 
 @dataclass

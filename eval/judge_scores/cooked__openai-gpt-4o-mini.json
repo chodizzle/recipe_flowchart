@@ -1,0 +1,25 @@
+{
+  "run_id": "cooked__openai-gpt-4o-mini",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "o3": [
+      "grouping",
+      "method"
+    ],
+    "o6": [
+      "method"
+    ],
+    "o4": [
+      "method"
+    ],
+    "o9": [
+      "method"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": false,
+    "missing_operation": false
+  },
+  "updated_at": "2026-08-05T00:01:22.058053+00:00"
+}

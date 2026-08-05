@@ -1,0 +1,25 @@
+{
+  "run_id": "cooked__google-gemini-3.5-flash-lite",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "i1": [
+      "prep"
+    ],
+    "i13": [
+      "prep"
+    ],
+    "o8": [
+      "decomposition",
+      "grouping"
+    ],
+    "o9": [
+      "prep"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": false,
+    "missing_operation": false
+  },
+  "updated_at": "2026-08-05T00:01:28.760635+00:00"
+}

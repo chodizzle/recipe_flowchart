@@ -1,0 +1,29 @@
+{
+  "run_id": "cooked__anthropic-claude-haiku-4-5",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "o12": [
+      "grouping",
+      "order"
+    ],
+    "o9": [
+      "grouping"
+    ],
+    "o4": [
+      "method",
+      "grouping"
+    ],
+    "o5": [
+      "grouping"
+    ],
+    "o10": [
+      "order"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": false,
+    "missing_operation": true
+  },
+  "updated_at": "2026-08-05T00:01:15.112935+00:00"
+}

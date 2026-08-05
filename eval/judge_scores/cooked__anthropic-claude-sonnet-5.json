@@ -1,0 +1,24 @@
+{
+  "run_id": "cooked__anthropic-claude-sonnet-5",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "i18": [
+      "decomposition"
+    ],
+    "o12": [
+      "decomposition"
+    ],
+    "o14": [
+      "decomposition"
+    ],
+    "o11": [
+      "method"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": false,
+    "missing_operation": false
+  },
+  "updated_at": "2026-08-05T00:01:18.258650+00:00"
+}

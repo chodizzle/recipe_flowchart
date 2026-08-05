@@ -1,0 +1,27 @@
+{
+  "run_id": "complex__anthropic-claude-haiku-4-5",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "o1": [
+      "method",
+      "grouping"
+    ],
+    "o5": [
+      "grouping",
+      "decomposition"
+    ],
+    "o6": [
+      "method",
+      "order"
+    ],
+    "o9": [
+      "ambiguous_source"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": true,
+    "missing_operation": false
+  },
+  "updated_at": "2026-08-05T00:01:52.858356+00:00"
+}

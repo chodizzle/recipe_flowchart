@@ -1,0 +1,20 @@
+{
+  "run_id": "complex__anthropic-claude-sonnet-5",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "o6": [
+      "grouping",
+      "method"
+    ],
+    "o9": [
+      "decomposition",
+      "extraneous"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": true,
+    "missing_operation": true
+  },
+  "updated_at": "2026-08-05T00:01:56.463310+00:00"
+}

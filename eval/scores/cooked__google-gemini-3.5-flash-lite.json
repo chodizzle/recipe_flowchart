@@ -1,23 +1,17 @@
 {
   "run_id": "cooked__google-gemini-3.5-flash-lite",
   "cell_flags": {
-    "o11": [
-      "order"
+    "o1": [
+      "grouping"
     ],
-    "o13": [
-      "order"
+    "i18": [
+      "decomposition"
     ],
-    "o12": [
-      "order"
-    ],
-    "o14": [
-      "order"
-    ],
-    "o4": [
-      "order"
+    "o6": [
+      "grouping"
     ]
   },
   "missing_flags": {},
   "reviewed": true,
-  "updated_at": "2026-08-04T01:46:58.564851+00:00"
+  "updated_at": "2026-08-05T00:49:45.828662+00:00"
 }

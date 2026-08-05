@@ -1,0 +1,22 @@
+{
+  "run_id": "complex__google-gemini-3.5-flash-lite",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "i9": [
+      "decomposition"
+    ],
+    "o3": [
+      "grouping"
+    ],
+    "o5": [
+      "decomposition",
+      "method"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": true,
+    "missing_operation": false
+  },
+  "updated_at": "2026-08-05T00:02:07.609673+00:00"
+}

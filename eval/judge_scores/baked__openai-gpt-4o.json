@@ -1,0 +1,18 @@
+{
+  "run_id": "baked__openai-gpt-4o",
+  "judge_model": "claude-sonnet-5",
+  "cell_flags": {
+    "o7": [
+      "decomposition"
+    ],
+    "o6": [
+      "decomposition"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": false,
+    "missing_setup": false,
+    "missing_operation": true
+  },
+  "updated_at": "2026-08-05T00:01:43.553074+00:00"
+}

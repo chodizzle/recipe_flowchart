@@ -1,20 +1,14 @@
 {
   "run_id": "cooked__anthropic-claude-sonnet-5",
   "cell_flags": {
-    "o8": [
-      "order"
-    ],
-    "o10": [
-      "order"
-    ],
     "i18": [
       "decomposition"
     ],
-    "o14": [
-      "layout_bug"
+    "o8": [
+      "grouping"
     ]
   },
   "missing_flags": {},
   "reviewed": true,
-  "updated_at": "2026-08-04T01:23:10.717565+00:00"
+  "updated_at": "2026-08-05T00:53:37.390994+00:00"
 }
