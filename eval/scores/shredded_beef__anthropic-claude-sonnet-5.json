@@ -1,0 +1,13 @@
+{
+  "run_id": "shredded_beef__anthropic-claude-sonnet-5",
+  "cell_flags": {
+    "o2": [
+      "layout_bug"
+    ]
+  },
+  "missing_flags": {
+    "missing_operation": false
+  },
+  "reviewed": true,
+  "updated_at": "2026-08-05T23:16:40.740536+00:00"
+}

@@ -1,0 +1,18 @@
+{
+  "run_id": "pancakes__anthropic-claude-haiku-4-5",
+  "cell_flags": {
+    "o3": [
+      "method",
+      "grouping"
+    ],
+    "o4": [
+      "grouping"
+    ],
+    "o8": [
+      "order"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-05T22:34:23.784811+00:00"
+}

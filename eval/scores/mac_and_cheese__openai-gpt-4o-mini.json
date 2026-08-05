@@ -1,0 +1,20 @@
+{
+  "run_id": "mac_and_cheese__openai-gpt-4o-mini",
+  "cell_flags": {
+    "o1": [
+      "grouping",
+      "method"
+    ],
+    "o2": [
+      "method",
+      "grouping"
+    ],
+    "o3": [
+      "order",
+      "layout_bug"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-05T22:48:14.078544+00:00"
+}

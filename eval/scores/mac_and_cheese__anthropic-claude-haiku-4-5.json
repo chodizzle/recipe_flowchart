@@ -1,0 +1,14 @@
+{
+  "run_id": "mac_and_cheese__anthropic-claude-haiku-4-5",
+  "cell_flags": {
+    "o3": [
+      "grouping"
+    ],
+    "o5": [
+      "order"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-05T22:46:23.660856+00:00"
+}

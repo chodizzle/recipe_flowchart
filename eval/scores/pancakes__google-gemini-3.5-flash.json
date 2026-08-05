@@ -1,0 +1,15 @@
+{
+  "run_id": "pancakes__google-gemini-3.5-flash",
+  "cell_flags": {
+    "o4": [
+      "grouping",
+      "method"
+    ],
+    "o8": [
+      "order"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-05T22:39:12.836873+00:00"
+}

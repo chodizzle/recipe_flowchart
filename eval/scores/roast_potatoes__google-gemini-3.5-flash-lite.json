@@ -1,0 +1,12 @@
+{
+  "run_id": "roast_potatoes__google-gemini-3.5-flash-lite",
+  "cell_flags": {
+    "o3": [
+      "grouping",
+      "order"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-05T01:37:48.545865+00:00"
+}

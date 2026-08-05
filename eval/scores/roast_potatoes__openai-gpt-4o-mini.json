@@ -1,0 +1,13 @@
+{
+  "run_id": "roast_potatoes__openai-gpt-4o-mini",
+  "cell_flags": {
+    "o2": [
+      "method"
+    ]
+  },
+  "missing_flags": {
+    "missing_setup": true
+  },
+  "reviewed": true,
+  "updated_at": "2026-08-05T01:36:53.122749+00:00"
+}

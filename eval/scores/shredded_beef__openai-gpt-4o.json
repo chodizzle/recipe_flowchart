@@ -1,0 +1,19 @@
+{
+  "run_id": "shredded_beef__openai-gpt-4o",
+  "cell_flags": {
+    "o2": [
+      "layout_bug"
+    ],
+    "o5": [
+      "grouping"
+    ],
+    "o7": [
+      "grouping"
+    ]
+  },
+  "missing_flags": {
+    "missing_operation": true
+  },
+  "reviewed": true,
+  "updated_at": "2026-08-05T23:05:55.140388+00:00"
+}

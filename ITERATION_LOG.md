@@ -162,3 +162,105 @@ was to skip it rather than force a marginal improvement. That's a legitimate,
 common outcome under real constraints, and worth stating as one rather than
 hiding it behind more tinkering. If revisited later, "re-derive and diff"
 (not a prompt edit) is the concrete next design to try.
+
+## 2026-08-05: full 10-recipe pass, and two findings worth keeping unfixed
+
+Expanded to 10 recipes (60 runs) and John scored all of them by hand. Full
+results aside (model ranking flipped -- Gemini 3.5 Flash is now the cleanest
+model overall, not Sonnet; GPT-4o mini remains worst by a wide margin; the
+order fix and noise-robustness both held up on new recipes built specifically
+to stress-test them), two findings surfaced that are more interesting *as open
+problems* than as bugs to patch, and John's call was to document them as
+"intrigue" and move on rather than open a third prompt-engineering cycle.
+
+**"Missing operation," or: the invisible transformation step.** On "Shredded
+Beef Tacos," most models correctly generate a step that adds shredded beef
+back into the reduced sauce -- but several don't properly chain that step
+back to an actual "remove and shred" operation. Gemini 3.5 Flash-Lite is the
+clean example: it *does* emit a node labeled "shred," but the final combine
+step skips past it and references the raw, whole `beef` ingredient again
+instead. On the rendered chart, the beef visually never gets shredded at all
+-- there's a disconnected "shred" node floating off to the side that nothing
+downstream actually uses. The general shape of the failure: models are good
+at producing the next step that *sounds* right ("toss the beef back in") from
+having seen that pattern in countless recipes, without the underlying graph
+actually verifying that step's input traces back through a real, connected
+chain of prior transformations. That's a broader caution for anyone chaining
+LLM outputs into a pipeline: a locally-plausible next step is not the same
+guarantee as a properly-grounded one, and the two can look identical unless
+something downstream (a human, a validator, a schema check) actually traces
+the lineage.
+
+**"Layout bug," or: extraction order silently becomes visual meaning.** On the
+same recipe, the rendered chart's "Season" bracket visually spans across
+"olive oil" even though olive oil isn't one of its real inputs -- confirmed by
+tracing the actual code: `gozinto_render.py` places ingredient rows in
+whatever order the model happened to emit them in, with zero semantic
+reordering, and an operation's cell spans from its lowest to highest input row
+inclusive. So when a later operation's true inputs (beef + spice mix) aren't
+contiguous in the model's own extraction order, the rendered bracket has no
+way to "skip over" an unrelated ingredient sitting in between -- it's not a
+reasoning failure in the model, and it's not a rendering bug in the strict
+sense either (the render is faithfully reflecting the order it was given). It's
+a mismatch: the renderer implicitly assumes nearby-in-list ingredients are more
+likely to be grouped together, and nothing ever told the model that its
+extraction order would carry that visual weight downstream. General lesson:
+when a downstream consumer (a UI, a report, another model) infers structure
+from the *order* of an upstream LLM's output rather than from explicit
+relationships, that's an assumption that can silently break, because output
+order is rarely something the upstream prompt was asked to optimize for.
+
+**Also still open, not chased further**: timing/order errors beyond the
+specific shared-resource pattern already fixed. It's not that heating oil
+first is always wrong, but recipes often contain cues that heating should
+follow certain other steps, and models still don't reliably anchor on those
+cues. The earlier fix only covers the narrower "same equipment reused" case,
+not general temporal-cue reasoning.
+
+**Decision, same as the judge thread**: don't reprompt. All three are
+plausibly fixable with more targeted instructions, but the value here is in
+having found and precisely diagnosed them, not in chasing a fourth prompt
+iteration before finishing the write-up.
+
+**A fourth finding, and it's the most important one for eval design specifically:
+this task doesn't have a single correct answer.** John's own scoring already
+treats it this way (multiple models on the same recipe both marked fully
+correct), but it's worth naming and grounding in an example. On "Roast
+Potatoes," three models scored zero issues with genuinely different graphs:
+
+- GPT-4o (7 ops) -- most compact. Doesn't model "boil water" as its own node
+  (folds it straight into the potato-boil step), and does the entire roast
+  (20 min undisturbed, then flip, then 30-40 more) as one operation.
+- Gemini 3.5 Flash (9 ops) -- middle ground. Separates "boil water" as its own
+  step, but still keeps the roast as one node.
+- Claude Sonnet 5 (10 ops) -- most granular. Separates "boil water" *and*
+  splits the roast into two explicit phases, mirroring the recipe's own
+  two-phase instruction (undisturbed, then flip-and-continue).
+
+None of these is more correct than the others -- they're just different
+choices about what granularity to decompose a continuous physical process
+(boiling, roasting) into discrete graph nodes, and all three read as an
+intuitive, usable Gozinto chart. The goal was never "reconstruct the one true
+graph," it was "produce something a human can read and trust" -- and there's
+real art in where you draw those lines, the same way there's more than one
+correct way to outline a recipe by hand.
+
+This retroactively sharpens why the LLM-judge thread struggled, and reframes
+what "closed, revisit with re-derive-and-diff" actually needs. A judge that
+builds its own reference graph and diffs against the extraction assumes a
+single correct graph to diff against -- but that assumption is false for this
+task, as this finding shows directly. A future judge redesign would need to
+evaluate structural *equivalence classes* or functional properties (are the
+true dependencies captured? is it readable?) rather than exact-match diffing
+against one reference. Worth remembering as the real reason a naive
+re-derive-and-diff judge wouldn't just be hard to build, but conceptually
+underspecified as-is.
+
+**General lesson for eval design**: before building any eval loop -- human,
+automated, or hybrid -- it's worth asking whether the task has one correct
+answer or a family of acceptable ones. Grading against a single reference
+(or asking a judge to reconstruct one) silently punishes valid alternatives
+in the second case. This task turned out to be the second case, and the eval
+tool (multi-tag, per-cell flags on what's *wrong* rather than diffing against
+a canonical answer) happened to be the right shape for that almost by
+accident -- worth being deliberate about next time rather than lucking into it.

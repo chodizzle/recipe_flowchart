@@ -1,0 +1,15 @@
+{
+  "run_id": "shredded_beef__anthropic-claude-haiku-4-5",
+  "cell_flags": {
+    "o3": [
+      "layout_bug"
+    ]
+  },
+  "missing_flags": {
+    "missing_setup": false,
+    "missing_operation": true,
+    "missing_ingredient": true
+  },
+  "reviewed": true,
+  "updated_at": "2026-08-05T23:01:11.576615+00:00"
+}

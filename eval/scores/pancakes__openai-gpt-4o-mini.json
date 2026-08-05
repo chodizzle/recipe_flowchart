@@ -1,0 +1,17 @@
+{
+  "run_id": "pancakes__openai-gpt-4o-mini",
+  "cell_flags": {
+    "o5": [
+      "grouping"
+    ],
+    "o4": [
+      "method"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": true,
+    "missing_setup": true
+  },
+  "reviewed": true,
+  "updated_at": "2026-08-05T22:36:41.586448+00:00"
+}

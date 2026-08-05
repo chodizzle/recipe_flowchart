@@ -1,0 +1,13 @@
+{
+  "run_id": "eggnog__openai-gpt-4o-mini",
+  "cell_flags": {
+    "o2": [
+      "method"
+    ]
+  },
+  "missing_flags": {
+    "missing_ingredient": true
+  },
+  "reviewed": true,
+  "updated_at": "2026-08-05T22:42:39.594489+00:00"
+}

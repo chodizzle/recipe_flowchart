@@ -1,0 +1,11 @@
+{
+  "run_id": "tikka_masala__google-gemini-3.5-flash-lite",
+  "cell_flags": {
+    "o2": [
+      "prep"
+    ]
+  },
+  "missing_flags": {},
+  "reviewed": true,
+  "updated_at": "2026-08-05T23:11:36.285539+00:00"
+}

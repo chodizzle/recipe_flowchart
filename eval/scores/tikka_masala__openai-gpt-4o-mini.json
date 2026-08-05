@@ -1,0 +1,16 @@
+{
+  "run_id": "tikka_masala__openai-gpt-4o-mini",
+  "cell_flags": {
+    "o1": [
+      "grouping"
+    ],
+    "i1": [
+      "prep"
+    ]
+  },
+  "missing_flags": {
+    "missing_operation": true
+  },
+  "reviewed": true,
+  "updated_at": "2026-08-05T23:11:20.737574+00:00"
+}
