@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import argparse
 import html
+import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -25,6 +27,26 @@ from recipe_parser import is_cached, parse_recipe  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 RECIPES_DIR = ROOT / "data" / "recipes"
 DOCS_DIR = ROOT / "docs"
+MEDIA_DIR = DOCS_DIR / "media"
+SCREENSHOTS_DIR = ROOT / "screenshots"
+SCORES_DIR = ROOT / "eval" / "scores"
+
+# Full worked example (rendered Gozinto + per-model stats table); every other recipe gets
+# summarized, not fully rendered -- 10 full tables was too much to scroll through. Picked
+# for size (10 ingredients, vs. 22+ for some others) without giving up structure (11
+# operations, 5 merges -- more ops than ingredients, real convergence to look at).
+SHOWCASE_RECIPE_ID = "complex"
+
+# The "no single correct answer" finding (see README) -- models that all scored zero
+# human-flagged issues on this recipe, with genuinely different graphs. The two shown are
+# the biggest structural spread of the three that qualified (7 ops vs. 10 ops), not all
+# three, since the point lands better with the clearest contrast than with every example.
+# Curated by hand, not auto-selected, since the point is a specific, verified example.
+GRANULARITY_RECIPE_ID = "roast_potatoes"
+GRANULARITY_MODELS = [
+    ("openai", "gpt-4o", "GPT-4o"),
+    ("anthropic", "claude-sonnet-5", "Claude Sonnet 5"),
+]
 
 RECIPES = [
     {
@@ -135,8 +157,21 @@ def run_pipeline(use_cache: bool = True) -> list[tuple[dict, list[tuple[str, Ext
 
 
 def render_html(all_results: list[tuple[dict, list[tuple[str, ExtractionResult]]]]) -> str:
-    cards = "\n".join(_render_recipe_card(recipe, results) for recipe, results in all_results)
-    return _PAGE_TEMPLATE.format(cards=cards)
+    by_id = {recipe["id"]: (recipe, results) for recipe, results in all_results}
+
+    showcase_recipe, showcase_results = by_id[SHOWCASE_RECIPE_ID]
+    showcase_card = _render_recipe_card(showcase_recipe, showcase_results)
+
+    recipe_list = _render_recipe_list(all_results)
+    model_rollup = _render_model_rollup(all_results)
+    granularity_section = _render_granularity_comparison(by_id)
+
+    return _PAGE_TEMPLATE.format(
+        showcase_card=showcase_card,
+        recipe_list=recipe_list,
+        model_rollup=model_rollup,
+        granularity_section=granularity_section,
+    )
 
 
 def _node_counts(nodes: list[dict]) -> tuple[int, int, int]:
@@ -180,6 +215,71 @@ def _render_table_row(label: str, r: ExtractionResult) -> str:
         f"<td>{r.output_tokens}</td><td>${r.estimated_cost_usd:.4f}</td>"
         f"<td>{r.latency_s:.1f}s</td><td>{n_ingredients}</td><td>{n_operations}</td><td>{n_merges}</td></tr>"
     )
+
+
+def _render_recipe_list(all_results: list[tuple[dict, list[tuple[str, ExtractionResult]]]]) -> str:
+    items = []
+    for recipe, _ in all_results:
+        source_line = (
+            f'<a href="{html.escape(recipe["source_url"])}">{html.escape(recipe["source"])}</a>'
+            if recipe["source_url"]
+            else html.escape(recipe["source"])
+        )
+        items.append(f'      <li><strong>{html.escape(recipe["label"])}</strong> &mdash; {source_line}</li>')
+    return "\n".join(items)
+
+
+def _eval_issue_counts() -> dict[str, int]:
+    """Total human-flagged issues per provider-model key, read straight from the eval
+    tool's own score files -- real numbers, not re-derived or approximated."""
+    counts: dict[str, int] = {}
+    if not SCORES_DIR.exists():
+        return counts
+    for f in SCORES_DIR.glob("*.json"):
+        data = json.loads(f.read_text(encoding="utf-8"))
+        _, model_key = data["run_id"].split("__", 1)
+        n = sum(len(v) for v in data["cell_flags"].values())
+        n += sum(1 for v in data["missing_flags"].values() if v)
+        counts[model_key] = counts.get(model_key, 0) + n
+    return counts
+
+
+def _render_model_rollup(all_results: list[tuple[dict, list[tuple[str, ExtractionResult]]]]) -> str:
+    issue_counts = _eval_issue_counts()
+    totals: dict[str, dict] = {}
+    for provider, model, label in RUNS:
+        totals[label] = {"cost": 0.0, "latency": 0.0, "n": 0, "issues": issue_counts.get(f"{provider}-{model}", 0)}
+    for _, results in all_results:
+        for label, r in results:
+            t = totals[label]
+            t["cost"] += r.estimated_cost_usd
+            t["latency"] += r.latency_s
+            t["n"] += 1
+
+    rows = []
+    for label, t in sorted(totals.items(), key=lambda kv: kv[1]["issues"]):
+        avg_latency = t["latency"] / t["n"] if t["n"] else 0.0
+        highlight = ' class="primary"' if label == PRIMARY_LABEL else ""
+        rows.append(
+            f"        <tr{highlight}><td>{html.escape(label)}</td><td>${t['cost']:.4f}</td>"
+            f"<td>{avg_latency:.1f}s</td><td>{t['issues']}</td></tr>"
+        )
+    return "\n".join(rows)
+
+
+def _render_granularity_comparison(by_id: dict[str, tuple[dict, list]]) -> str:
+    recipe, _ = by_id[GRANULARITY_RECIPE_ID]
+    columns = []
+    for provider, model, label in GRANULARITY_MODELS:
+        r = parse_recipe(recipe["input"], provider, model, use_cache=True)
+        n_ingredients, n_operations, n_merges = _node_counts(r.nodes)
+        columns.append(f"""
+      <div class="granularity-col">
+        <h3>{html.escape(label)}</h3>
+        <p class="tagline">{n_operations} operations, {n_merges} merges &mdash; scored zero issues</p>
+        {to_table_html(r.nodes)}
+      </div>""")
+    return "\n".join(columns)
 
 
 _PAGE_TEMPLATE = """<!doctype html>
@@ -248,17 +348,68 @@ _PAGE_TEMPLATE = """<!doctype html>
   a {{ color: var(--accent2); }}
   code {{ background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9em; }}
   footer {{ margin-top: 3rem; color: var(--muted); font-size: 0.85rem; }}
+
+  section.section {{ margin: 2.6rem 0; }}
+  section.section h2 {{ font-size: 1.4rem; }}
+  .eval-media {{ display: flex; gap: 1.2rem; flex-wrap: wrap; align-items: flex-start; margin-top: 1rem; }}
+  .eval-media video {{ max-width: 100%; width: 480px; border-radius: 8px; border: 1px solid var(--border); }}
+  .eval-media .screenshots {{ display: flex; gap: 0.8rem; flex-wrap: wrap; }}
+  .eval-media img {{ max-width: 220px; width: 100%; border-radius: 8px; border: 1px solid var(--border); }}
+  .recipe-list {{ columns: 2; column-gap: 2rem; padding-left: 1.1rem; margin: 1rem 0; }}
+  .recipe-list li {{ break-inside: avoid; margin-bottom: 0.3rem; }}
+  @media (max-width: 640px) {{ .recipe-list {{ columns: 1; }} }}
+  .granularity-wrap {{ display: flex; flex-direction: column; gap: 1.4rem; margin-top: 1rem; }}
+  .granularity-col {{ background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; }}
+  .granularity-col h3 {{ margin: 0 0 0.2rem; font-size: 1.1rem; }}
 </style>
 </head>
 <body>
 <main>
   <h1>Recipe Flowchart</h1>
-  <p class="tagline">Turning recipes into dependency graphs -- and testing how cheap a model can be while still getting the graph right.</p>
-  <p>Structuring unstructured text used to mean regex and endless if-chains. LLMs are now good enough, and cheap enough, to do it directly: each recipe below was run through the same forced-JSON extraction across six models from three providers, so the comparison table shows what you actually pay for accuracy versus what you don't.</p>
+  <p class="tagline">LLMs can structure your data. Knowing whether they got it right is the actual work.</p>
+  <p>Turning a recipe into a Gozinto chart (an assembly diagram: ingredients converge through operations into a finished dish) is easy for an LLM to do. What's actually hard is that there's no ground-truth dataset for "is this correct" &mdash; only a domain expert's judgment. This project is a worked example of building that eval loop for real: a taxonomy-based human scoring tool, a bug found and fixed and re-validated against the same rubric that found it, an automated judge tried and honestly closed, and a finding that this kind of task doesn't even have one correct answer. The model comparison below is real, but it's supporting material, not the point.</p>
 
-{cards}
+  <section class="section">
+    <h2>The eval tool</h2>
+    <p>Every one of the 60 runs below was scored by hand against a fixed taxonomy (click a cell, tag why it's wrong, no free text) in a local tool built for exactly this. It isn't part of this static site &mdash; it writes real annotation data to disk, which a GitHub Pages site can't do &mdash; so here's what it looks like in use instead.</p>
+    <div class="eval-media">
+      <video src="media/eval_demo.mp4" controls preload="metadata"></video>
+      <div class="screenshots">
+        <img src="media/eval_1.png" alt="Eval tool: recipe source next to the rendered Gozinto chart, click-to-tag interface">
+        <img src="media/eval_2.png" alt="Eval tool: tag popover open on a flagged cell, showing the taxonomy and the resolved raw inputs">
+      </div>
+    </div>
+  </section>
 
-  <footer>Full pipeline, provider code, and example recipes: <a href="https://github.com/chodizzle/recipe_flowchart">github.com/chodizzle/recipe_flowchart</a>.</footer>
+  <section class="section">
+    <h2>Worked example</h2>
+    <p>One recipe shown in full &mdash; the rendered graph plus how all 6 models did on it. Picked for size, not drama: compact enough to read without a lot of scrolling, but still dense with the kind of convergence (multiple ingredients folding into one operation) that makes a Gozinto chart worth looking at. It's also the most visually distinctive input in the set &mdash; a photo of my own handwritten, bilingual kitchen notes, with hand-drawn brackets already marking which sub-steps run in parallel.</p>
+{showcase_card}
+  </section>
+
+  <section class="section">
+    <h2>All 10 recipes</h2>
+    <p>Chosen to stress-test specific things, not just to pad the count &mdash; genuine parallel prep, raw unedited web-scrape noise, several variations on ingredients that split across steps, and one recipe added specifically to check whether the bug fix above generalized.</p>
+    <ul class="recipe-list">
+{recipe_list}
+    </ul>
+    <table class="stats">
+      <thead><tr><th>Model</th><th>Total cost (10 recipes)</th><th>Avg latency</th><th>Human-flagged issues (60 runs)</th></tr></thead>
+      <tbody>
+{model_rollup}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2>Same recipe, two different (and equally correct) structures</h2>
+    <p>Both of these models scored <strong>zero</strong> human-flagged issues on the same recipe &mdash; and produced genuinely different graphs, the biggest structural gap of any pair that both scored clean. GPT-4o folds "boil water" into the potato-boiling step and does the whole roast as one operation. Claude Sonnet 5 splits both out: its own "boil water" step, and the roast broken into its two real phases (undisturbed, then flip-and-continue). Neither is more correct than the other &mdash; they're different, equally valid choices about how finely to decompose a continuous process, which is the real reason this project didn't try to grade against one canonical answer.</p>
+    <div class="granularity-wrap">
+{granularity_section}
+    </div>
+  </section>
+
+  <footer>Full pipeline, eval tool, and write-up: <a href="https://github.com/chodizzle/recipe_flowchart">github.com/chodizzle/recipe_flowchart</a>.</footer>
 </main>
 </body>
 </html>
@@ -274,8 +425,21 @@ def main(use_cache: bool = True) -> None:
         print("No recipes found -- nothing to render.")
         return
     DOCS_DIR.mkdir(exist_ok=True)
+    _copy_media()
     (DOCS_DIR / "index.html").write_text(render_html(all_results), encoding="utf-8")
     print(f"wrote {DOCS_DIR / 'index.html'}")
+
+
+def _copy_media() -> None:
+    """GitHub Pages serves only from docs/, so the eval-tool demo assets have to live
+    there too, not just in the repo-root screenshots/ folder they're recorded into."""
+    MEDIA_DIR.mkdir(exist_ok=True)
+    for name in ("eval_demo.mp4", "eval_1.png", "eval_2.png"):
+        src = SCREENSHOTS_DIR / name
+        if src.exists():
+            shutil.copy(src, MEDIA_DIR / name)
+        else:
+            print(f"warning: {src} not found, site will have a broken media reference")
 
 
 def _cli() -> None:

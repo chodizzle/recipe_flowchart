@@ -64,88 +64,42 @@
   a { color: var(--accent2); }
   code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9em; }
   footer { margin-top: 3rem; color: var(--muted); font-size: 0.85rem; }
+
+  section.section { margin: 2.6rem 0; }
+  section.section h2 { font-size: 1.4rem; }
+  .eval-media { display: flex; gap: 1.2rem; flex-wrap: wrap; align-items: flex-start; margin-top: 1rem; }
+  .eval-media video { max-width: 100%; width: 480px; border-radius: 8px; border: 1px solid var(--border); }
+  .eval-media .screenshots { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+  .eval-media img { max-width: 220px; width: 100%; border-radius: 8px; border: 1px solid var(--border); }
+  .recipe-list { columns: 2; column-gap: 2rem; padding-left: 1.1rem; margin: 1rem 0; }
+  .recipe-list li { break-inside: avoid; margin-bottom: 0.3rem; }
+  @media (max-width: 640px) { .recipe-list { columns: 1; } }
+  .granularity-wrap { display: flex; flex-direction: column; gap: 1.4rem; margin-top: 1rem; }
+  .granularity-col { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; }
+  .granularity-col h3 { margin: 0 0 0.2rem; font-size: 1.1rem; }
 </style>
 </head>
 <body>
 <main>
   <h1>Recipe Flowchart</h1>
-  <p class="tagline">Turning recipes into dependency graphs -- and testing how cheap a model can be while still getting the graph right.</p>
-  <p>Structuring unstructured text used to mean regex and endless if-chains. LLMs are now good enough, and cheap enough, to do it directly: each recipe below was run through the same forced-JSON extraction across six models from three providers, so the comparison table shows what you actually pay for accuracy versus what you don't.</p>
+  <p class="tagline">LLMs can structure your data. Knowing whether they got it right is the actual work.</p>
+  <p>Turning a recipe into a Gozinto chart (an assembly diagram: ingredients converge through operations into a finished dish) is easy for an LLM to do. What's actually hard is that there's no ground-truth dataset for "is this correct" &mdash; only a domain expert's judgment. This project is a worked example of building that eval loop for real: a taxonomy-based human scoring tool, a bug found and fixed and re-validated against the same rubric that found it, an automated judge tried and honestly closed, and a finding that this kind of task doesn't even have one correct answer. The model comparison below is real, but it's supporting material, not the point.</p>
 
-
-  <section class="card">
-    <h2>Cooked: Chinese Sweet and Sour Pork</h2>
-    <p class="tagline">Source: Serious Eats</p>
-    <table class="gozinto">
-<tbody>
-<tr><td data-node-id="i1" class="ingredient"><span class="name">pork tenderloin, cubed</span><span class="amount">12 ounces (340 g)</span></td><td class="empty"></td><td rowspan="8" data-node-id="o2" class="op"><span class="technique">marinate pork</span><span class="detail">at least 15 minutes, up to 2 hours refrigerated</span></td><td rowspan="11" data-node-id="o4" class="op"><span class="technique">clump dredge with marinade</span></td><td rowspan="11" data-node-id="o5" class="op"><span class="technique">coat pork in dredge</span></td><td rowspan="12" data-node-id="o6" class="op"><span class="technique">fry</span><span class="detail">325F (165C), about 2 min per batch</span></td><td rowspan="12" data-node-id="o7" class="op"><span class="technique">fry again</span><span class="detail">375F (190C), about 1-1.5 min per batch</span></td><td rowspan="15" data-node-id="o8" class="op"><span class="technique">fry</span><span class="detail">about 1 min</span></td><td rowspan="15" data-node-id="o9" class="op"><span class="technique">pour off oil, reserve</span><span class="detail">reserve 1 tablespoon oil</span></td><td rowspan="20" data-node-id="o11" class="op"><span class="technique">cook sauce</span><span class="detail">medium heat, until bubbling</span></td><td rowspan="21" data-node-id="o13" class="op"><span class="technique">thicken sauce</span><span class="detail">about 30 seconds, until thickened and glossy</span></td><td rowspan="21" data-node-id="o14" class="op"><span class="technique">toss to coat</span></td></tr>
-<tr><td data-node-id="i2" class="ingredient"><span class="name">Shaoxing wine</span><span class="amount">2 tablespoons (30 ml)</span></td><td rowspan="7" data-node-id="o1" class="op"><span class="technique">whisk marinade</span></td></tr>
-<tr><td data-node-id="i3" class="ingredient"><span class="name">egg plus egg white</span><span class="amount">1 large egg plus 1 egg white</span></td></tr>
-<tr><td data-node-id="i4" class="ingredient"><span class="name">baking soda</span><span class="amount">1/4 teaspoon</span></td></tr>
-<tr><td data-node-id="i5" class="ingredient"><span class="name">ground white pepper</span><span class="amount">1/8 teaspoon</span></td></tr>
-<tr><td data-node-id="i6" class="ingredient"><span class="name">neutral oil (marinade)</span><span class="amount">1 tablespoon (15 ml)</span></td></tr>
-<tr><td data-node-id="i7" class="ingredient"><span class="name">potato starch or cornstarch (marinade)</span><span class="amount">2 teaspoons</span></td></tr>
-<tr><td data-node-id="i8" class="ingredient"><span class="name">Diamond Crystal kosher salt (marinade)</span><span class="amount">1/2 teaspoon</span></td></tr>
-<tr><td data-node-id="i9" class="ingredient"><span class="name">potato starch or cornstarch (dredge)</span><span class="amount">1/2 cup plus 2 tablespoons</span></td><td rowspan="3" data-node-id="o3" class="op"><span class="technique">whisk dredge</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i10" class="ingredient"><span class="name">baking powder (dredge)</span><span class="amount">1/4 teaspoon</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i11" class="ingredient"><span class="name">Diamond Crystal kosher salt (dredge)</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i12" class="ingredient"><span class="name">neutral oil, for frying</span><span class="amount">4 cups</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i13" class="ingredient"><span class="name">pineapple, cut into 1-inch pieces</span><span class="amount">170 g</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i14" class="ingredient"><span class="name">green bell pepper, cut into 1-inch pieces</span><span class="amount">1/2 large</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i15" class="ingredient"><span class="name">red bell pepper, cut into 1-inch pieces</span><span class="amount">1/2 large</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i16" class="ingredient"><span class="name">ketchup</span><span class="amount">5 tablespoons</span></td><td rowspan="5" data-node-id="o10" class="op"><span class="technique">whisk sauce base</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i17" class="ingredient"><span class="name">distilled white vinegar</span><span class="amount">2 tablespoons</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i18" class="ingredient"><span class="name">water</span><span class="amount">3 tablespoons, divided</span></td><td rowspan="4" data-node-id="o12" class="op"><span class="technique">whisk slurry</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i19" class="ingredient"><span class="name">granulated sugar</span><span class="amount">2 tablespoons plus 1 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i20" class="ingredient"><span class="name">Diamond Crystal kosher salt (sauce)</span><span class="amount">1/4 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i21" class="ingredient"><span class="name">cornstarch (sauce)</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i22" class="ingredient"><span class="name">white rice, for serving</span><span class="amount">optional</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-</tbody>
-</table>
-    <table class="stats">
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>3077</td><td>1983</td><td>$0.0130</td><td>9.0s</td><td>22</td><td>13</td><td>12</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>3765</td><td>2334</td><td>$0.0463</td><td>15.6s</td><td>22</td><td>14</td><td>12</td></tr>
-        <tr><td>GPT-4o mini</td><td>2012</td><td>1283</td><td>$0.0011</td><td>13.3s</td><td>24</td><td>9</td><td>6</td></tr>
-        <tr><td>GPT-4o</td><td>2012</td><td>1497</td><td>$0.0200</td><td>9.6s</td><td>22</td><td>16</td><td>13</td></tr>
-        <tr><td>Gemini 3.5 Flash-Lite</td><td>2233</td><td>1636</td><td>$0.0048</td><td>4.0s</td><td>22</td><td>9</td><td>9</td></tr>
-        <tr><td>Gemini 3.5 Flash</td><td>2233</td><td>1936</td><td>$0.0208</td><td>29.5s</td><td>22</td><td>14</td><td>13</td></tr>
-      </tbody>
-    </table>
+  <section class="section">
+    <h2>The eval tool</h2>
+    <p>Every one of the 60 runs below was scored by hand against a fixed taxonomy (click a cell, tag why it's wrong, no free text) in a local tool built for exactly this. It isn't part of this static site &mdash; it writes real annotation data to disk, which a GitHub Pages site can't do &mdash; so here's what it looks like in use instead.</p>
+    <div class="eval-media">
+      <video src="media/eval_demo.mp4" controls preload="metadata"></video>
+      <div class="screenshots">
+        <img src="media/eval_1.png" alt="Eval tool: recipe source next to the rendered Gozinto chart, click-to-tag interface">
+        <img src="media/eval_2.png" alt="Eval tool: tag popover open on a flagged cell, showing the taxonomy and the resolved raw inputs">
+      </div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>Baked: Spinach Egg Bites</h2>
-    <p class="tagline">Source: NYT Cooking</p>
-    <table class="gozinto">
-<tbody>
-<tr><td colspan="8" data-node-id="o1" class="setup">preheat oven &mdash; 375 degrees, rack in center</td></tr>
-<tr><td data-node-id="i1" class="ingredient"><span class="name">olive oil</span><span class="amount">for greasing</span></td><td data-node-id="o2" class="op"><span class="technique">grease muffin tin</span></td><td class="empty"></td><td class="empty"></td><td rowspan="11" data-node-id="o6" class="op"><span class="technique">fill muffin tin</span><span class="detail">about 1/3 cup each</span></td><td rowspan="11" data-node-id="o7" class="op"><span class="technique">bake</span><span class="detail">375 degrees, 20-25 min, until set</span></td><td rowspan="11" data-node-id="o8" class="op"><span class="technique">cool</span><span class="detail">cool completely</span></td><td rowspan="11" data-node-id="o9" class="op"><span class="technique">release with knife</span></td></tr>
-<tr><td data-node-id="i2" class="ingredient"><span class="name">frozen chopped spinach</span><span class="amount">2 (10-ounce) packages, thawed</span></td><td data-node-id="o3" class="op"><span class="technique">squeeze out water</span></td><td rowspan="8" data-node-id="o4" class="op"><span class="technique">combine</span></td><td rowspan="10" data-node-id="o5" class="op"><span class="technique">stir in flour and baking powder</span></td></tr>
-<tr><td data-node-id="i3" class="ingredient"><span class="name">scallions</span><span class="amount">4, thinly sliced crosswise</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i4" class="ingredient"><span class="name">large eggs</span><span class="amount">6</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i5" class="ingredient"><span class="name">cottage cheese</span><span class="amount">2 cups (16 ounces)</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i6" class="ingredient"><span class="name">grated Parmesan</span><span class="amount">1/4 cup</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i7" class="ingredient"><span class="name">ground nutmeg</span><span class="amount">pinch</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i8" class="ingredient"><span class="name">salt</span><span class="amount">to taste</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i9" class="ingredient"><span class="name">black pepper</span><span class="amount">to taste, freshly ground</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i10" class="ingredient"><span class="name">all-purpose flour</span><span class="amount">6 tablespoons</span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i11" class="ingredient"><span class="name">baking powder</span><span class="amount">1 teaspoon</span></td><td class="empty"></td><td class="empty"></td></tr>
-</tbody>
-</table>
-    <table class="stats">
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>2444</td><td>995</td><td>$0.0074</td><td>4.8s</td><td>11</td><td>8</td><td>3</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>2946</td><td>1186</td><td>$0.0266</td><td>8.5s</td><td>11</td><td>9</td><td>4</td></tr>
-        <tr><td>GPT-4o mini</td><td>1545</td><td>415</td><td>$0.0005</td><td>6.3s</td><td>11</td><td>1</td><td>0</td></tr>
-        <tr><td>GPT-4o</td><td>1545</td><td>711</td><td>$0.0110</td><td>5.9s</td><td>10</td><td>9</td><td>4</td></tr>
-        <tr><td>Gemini 3.5 Flash-Lite</td><td>1736</td><td>816</td><td>$0.0026</td><td>3.0s</td><td>10</td><td>7</td><td>4</td></tr>
-        <tr><td>Gemini 3.5 Flash</td><td>1736</td><td>794</td><td>$0.0097</td><td>20.0s</td><td>10</td><td>6</td><td>3</td></tr>
-      </tbody>
-    </table>
-  </section>
+  <section class="section">
+    <h2>Worked example</h2>
+    <p>One recipe shown in full &mdash; the rendered graph plus how all 6 models did on it. Picked for size, not drama: compact enough to read without a lot of scrolling, but still dense with the kind of convergence (multiple ingredients folding into one operation) that makes a Gozinto chart worth looking at. It's also the most visually distinctive input in the set &mdash; a photo of my own handwritten, bilingual kitchen notes, with hand-drawn brackets already marking which sub-steps run in parallel.</p>
 
   <section class="card">
     <h2>Handwritten: Choux au Craquelin</h2>
@@ -176,11 +130,63 @@
       </tbody>
     </table>
   </section>
+  </section>
 
-  <section class="card">
-    <h2>Web Scrape: The Best Crispy Roast Potatoes Ever</h2>
-    <p class="tagline">Source: <a href="https://www.seriouseats.com/the-best-roast-potatoes-ever-recipe">Serious Eats (J. Kenji López-Alt)</a></p>
-    <table class="gozinto">
+  <section class="section">
+    <h2>All 10 recipes</h2>
+    <p>Chosen to stress-test specific things, not just to pad the count &mdash; genuine parallel prep, raw unedited web-scrape noise, several variations on ingredients that split across steps, and one recipe added specifically to check whether the bug fix above generalized.</p>
+    <ul class="recipe-list">
+      <li><strong>Cooked</strong> &mdash; Serious Eats</li>
+      <li><strong>Baked</strong> &mdash; NYT Cooking</li>
+      <li><strong>Handwritten</strong> &mdash; My own kitchen notes (bilingual shorthand, hand-drawn dependency brackets)</li>
+      <li><strong>Web Scrape</strong> &mdash; <a href="https://www.seriouseats.com/the-best-roast-potatoes-ever-recipe">Serious Eats (J. Kenji López-Alt)</a></li>
+      <li><strong>Pancakes</strong> &mdash; Serious Eats (J. Kenji López-Alt)</li>
+      <li><strong>Eggnog</strong> &mdash; Alton Brown</li>
+      <li><strong>Mac &amp; Cheese</strong> &mdash; <a href="https://www.foodnetwork.com/recipes/alton-brown/stovetop-mac-n-cheese-recipe-1939465">Food Network (Alton Brown)</a></li>
+      <li><strong>Potstickers</strong> &mdash; Damn Delicious</li>
+      <li><strong>Shredded Beef Tacos</strong> &mdash; RecipeTin Eats (Nagi)</li>
+      <li><strong>Tikka Masala</strong> &mdash; Savory Tooth</li>
+    </ul>
+    <table class="stats">
+      <thead><tr><th>Model</th><th>Total cost (10 recipes)</th><th>Avg latency</th><th>Human-flagged issues (60 runs)</th></tr></thead>
+      <tbody>
+        <tr><td>Gemini 3.5 Flash</td><td>$0.1327</td><td>23.2s</td><td>7</td></tr>
+        <tr class="primary"><td>Claude Sonnet 5</td><td>$0.3370</td><td>10.9s</td><td>10</td></tr>
+        <tr><td>Gemini 3.5 Flash-Lite</td><td>$0.0332</td><td>3.0s</td><td>12</td></tr>
+        <tr><td>GPT-4o</td><td>$0.1306</td><td>5.8s</td><td>18</td></tr>
+        <tr><td>Claude Haiku 4.5</td><td>$0.0895</td><td>5.8s</td><td>23</td></tr>
+        <tr><td>GPT-4o mini</td><td>$0.0128</td><td>9.9s</td><td>33</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2>Same recipe, two different (and equally correct) structures</h2>
+    <p>Both of these models scored <strong>zero</strong> human-flagged issues on the same recipe &mdash; and produced genuinely different graphs, the biggest structural gap of any pair that both scored clean. GPT-4o folds "boil water" into the potato-boiling step and does the whole roast as one operation. Claude Sonnet 5 splits both out: its own "boil water" step, and the roast broken into its two real phases (undisturbed, then flip-and-continue). Neither is more correct than the other &mdash; they're different, equally valid choices about how finely to decompose a continuous process, which is the real reason this project didn't try to grade against one canonical answer.</p>
+    <div class="granularity-wrap">
+
+      <div class="granularity-col">
+        <h3>GPT-4o</h3>
+        <p class="tagline">7 operations, 4 merges &mdash; scored zero issues</p>
+        <table class="gozinto">
+<tbody>
+<tr><td colspan="6" data-node-id="o1" class="setup">preheat oven &mdash; 450°F (230°C) or 400°F (200°C) if using convection</td></tr>
+<tr><td data-node-id="i1" class="ingredient"><span class="name">kosher salt</span><span class="amount"></span></td><td rowspan="3" data-node-id="o2" class="op"><span class="technique">boil</span><span class="detail">10 minutes after returning to a boil</span></td><td class="empty"></td><td rowspan="7" data-node-id="o5" class="op"><span class="technique">toss</span><span class="detail">until a thick layer of mashed potato–like paste has built up</span></td><td rowspan="7" data-node-id="o6" class="op"><span class="technique">roast</span><span class="detail">20 minutes, then turn and roast 30 to 40 minutes longer</span></td><td rowspan="8" data-node-id="o7" class="op"><span class="technique">toss</span><span class="detail">with garlic/rosemary mixture and minced parsley</span></td></tr>
+<tr><td data-node-id="i2" class="ingredient"><span class="name">baking soda</span><span class="amount">1/2 teaspoon (4 g)</span></td><td class="empty"></td></tr>
+<tr><td data-node-id="i3" class="ingredient"><span class="name">russet or Yukon Gold potatoes</span><span class="amount">4 pounds (about 2 kg), peeled and cut into quarters, sixths, or eighths</span></td><td class="empty"></td></tr>
+<tr><td data-node-id="i4" class="ingredient"><span class="name">extra-virgin olive oil, duck fat, goose fat, or beef fat</span><span class="amount">5 tablespoons (75 ml)</span></td><td rowspan="4" data-node-id="o3" class="op"><span class="technique">heat</span><span class="detail">until garlic just begins to turn golden, about 3 minutes</span></td><td rowspan="4" data-node-id="o4" class="op"><span class="technique">strain</span></td></tr>
+<tr><td data-node-id="i5" class="ingredient"><span class="name">fresh rosemary leaves</span><span class="amount">small handful, finely chopped</span></td></tr>
+<tr><td data-node-id="i6" class="ingredient"><span class="name">garlic</span><span class="amount">3 medium cloves, minced</span></td></tr>
+<tr><td data-node-id="i7" class="ingredient"><span class="name">freshly ground black pepper</span><span class="amount"></span></td></tr>
+<tr><td data-node-id="i8" class="ingredient"><span class="name">fresh parsley leaves</span><span class="amount">small handful, minced</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
+</tbody>
+</table>
+      </div>
+
+      <div class="granularity-col">
+        <h3>Claude Sonnet 5</h3>
+        <p class="tagline">10 operations, 5 merges &mdash; scored zero issues</p>
+        <table class="gozinto">
 <tbody>
 <tr><td colspan="8" data-node-id="o1" class="setup">preheat oven &mdash; 450°F (230°C) or 400°F (200°C) if using convection</td></tr>
 <tr><td data-node-id="i1" class="ingredient"><span class="name">water</span><span class="amount">2 quarts (2L)</span></td><td data-node-id="o2" class="op"><span class="technique">boil water</span></td><td rowspan="4" data-node-id="o3" class="op"><span class="technique">add salt, baking soda, and potatoes, boil then simmer</span><span class="detail">about 10 minutes after returning to a boil</span></td><td rowspan="4" data-node-id="o6" class="op"><span class="technique">drain and rest potatoes</span><span class="detail">about 30 seconds</span></td><td rowspan="8" data-node-id="o7" class="op"><span class="technique">toss potatoes with infused oil, season</span></td><td rowspan="8" data-node-id="o8" class="op"><span class="technique">spread on baking sheet and roast</span><span class="detail">20 minutes, without moving</span></td><td rowspan="8" data-node-id="o9" class="op"><span class="technique">flip, shake, and continue roasting</span><span class="detail">30-40 minutes longer, until deep brown and crisp</span></td><td rowspan="9" data-node-id="o10" class="op"><span class="technique">toss with reserved garlic/rosemary and parsley, season</span></td></tr>
@@ -194,225 +200,11 @@
 <tr><td data-node-id="i9" class="ingredient"><span class="name">fresh parsley leaves, minced</span><span class="amount">small handful</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
 </tbody>
 </table>
-    <table class="stats">
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>5677</td><td>1109</td><td>$0.0112</td><td>6.1s</td><td>8</td><td>11</td><td>5</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>7341</td><td>1445</td><td>$0.0437</td><td>10.6s</td><td>9</td><td>10</td><td>5</td></tr>
-        <tr><td>GPT-4o mini</td><td>4265</td><td>587</td><td>$0.0010</td><td>10.0s</td><td>8</td><td>5</td><td>4</td></tr>
-        <tr><td>GPT-4o</td><td>4265</td><td>635</td><td>$0.0170</td><td>4.9s</td><td>8</td><td>7</td><td>4</td></tr>
-        <tr><td>Gemini 3.5 Flash-Lite</td><td>4565</td><td>1116</td><td>$0.0042</td><td>3.0s</td><td>10</td><td>9</td><td>5</td></tr>
-        <tr><td>Gemini 3.5 Flash</td><td>4565</td><td>954</td><td>$0.0154</td><td>27.0s</td><td>9</td><td>9</td><td>5</td></tr>
-      </tbody>
-    </table>
+      </div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>Pancakes: Light and Fluffy Buttermilk Pancakes</h2>
-    <p class="tagline">Source: Serious Eats (J. Kenji López-Alt)</p>
-    <table class="gozinto">
-<tbody>
-<tr><td colspan="8" data-node-id="o8" class="setup">heat skillet &mdash; medium heat, 5 min</td></tr>
-<tr><td data-node-id="i1" class="ingredient"><span class="name">all-purpose flour</span><span class="amount">10 ounces (about 2 cups)</span></td><td rowspan="5" data-node-id="o1" class="op"><span class="technique">whisk</span></td><td rowspan="5" data-node-id="o2" class="op"><span class="technique">transfer to airtight container</span></td><td class="empty"></td><td rowspan="10" data-node-id="o7" class="op"><span class="technique">fold in</span></td><td rowspan="12" data-node-id="o10" class="op"><span class="technique">portion and cook first side</span><span class="detail">about 2 min, until bubbles form and bottoms golden brown</span></td><td rowspan="12" data-node-id="o11" class="op"><span class="technique">flip and cook second side</span><span class="detail">about 2 min longer, until golden brown and set</span></td><td rowspan="12" data-node-id="o12" class="op"><span class="technique">serve</span></td></tr>
-<tr><td data-node-id="i2" class="ingredient"><span class="name">baking powder</span><span class="amount">1 teaspoon</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i3" class="ingredient"><span class="name">baking soda</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i4" class="ingredient"><span class="name">kosher salt</span><span class="amount">1 teaspoon</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i5" class="ingredient"><span class="name">sugar</span><span class="amount">1 tablespoon</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i6" class="ingredient"><span class="name">eggs, separated (whites)</span><span class="amount">2 large</span></td><td data-node-id="o3" class="op"><span class="technique">whisk to stiff peaks</span></td><td class="empty"></td><td rowspan="5" data-node-id="o6" class="op"><span class="technique">fold in</span></td></tr>
-<tr><td data-node-id="i7" class="ingredient"><span class="name">eggs, separated (yolks)</span><span class="amount">2 large</span></td><td rowspan="3" data-node-id="o4" class="op"><span class="technique">whisk</span></td><td rowspan="4" data-node-id="o5" class="op"><span class="technique">drizzle in while whisking</span></td></tr>
-<tr><td data-node-id="i8" class="ingredient"><span class="name">buttermilk</span><span class="amount">1 1/2 cups (about 12 ounces)</span></td></tr>
-<tr><td data-node-id="i9" class="ingredient"><span class="name">sour cream</span><span class="amount">1 cup (about 8 ounces)</span></td></tr>
-<tr><td data-node-id="i10" class="ingredient"><span class="name">unsalted butter, melted</span><span class="amount">4 tablespoons</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i11" class="ingredient"><span class="name">warm maple syrup</span><span class="amount">to taste</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i12" class="ingredient"><span class="name">butter or oil for griddle</span><span class="amount">small amount</span></td><td data-node-id="o9" class="op"><span class="technique">grease and wipe griddle</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-</tbody>
-</table>
-    <table class="stats">
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>2790</td><td>1253</td><td>$0.0091</td><td>6.0s</td><td>12</td><td>11</td><td>8</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>3440</td><td>1478</td><td>$0.0325</td><td>11.0s</td><td>12</td><td>12</td><td>8</td></tr>
-        <tr><td>GPT-4o mini</td><td>1827</td><td>795</td><td>$0.0008</td><td>10.4s</td><td>10</td><td>12</td><td>7</td></tr>
-        <tr><td>GPT-4o</td><td>1827</td><td>814</td><td>$0.0127</td><td>5.8s</td><td>10</td><td>11</td><td>8</td></tr>
-        <tr><td>Gemini 3.5 Flash-Lite</td><td>2013</td><td>1287</td><td>$0.0038</td><td>3.3s</td><td>12</td><td>13</td><td>8</td></tr>
-        <tr><td>Gemini 3.5 Flash</td><td>2013</td><td>1088</td><td>$0.0128</td><td>11.9s</td><td>12</td><td>10</td><td>7</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="card">
-    <h2>Eggnog: Eggnog</h2>
-    <p class="tagline">Source: Alton Brown</p>
-    <table class="gozinto">
-<tbody>
-<tr><td data-node-id="i1" class="ingredient"><span class="name">large eggs</span><span class="amount">12</span></td><td data-node-id="o1" class="op"><span class="technique">separate eggs</span></td><td rowspan="3" data-node-id="o2" class="op"><span class="technique">beat</span><span class="detail">until mixture lightens and falls in a ribbon</span></td><td rowspan="10" data-node-id="o4" class="op"><span class="technique">beat in</span><span class="detail">slowly</span></td><td rowspan="10" data-node-id="o5" class="op"><span class="technique">jar and age</span><span class="detail">minimum 2 weeks, ideally 1-2 months or longer</span></td><td rowspan="10" data-node-id="o6" class="op"><span class="technique">serve</span><span class="detail">topped with grated nutmeg</span></td></tr>
-<tr><td data-node-id="i2" class="ingredient"><span class="name">sugar</span><span class="amount">1 pound</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i3" class="ingredient"><span class="name">freshly grated nutmeg</span><span class="amount">1 teaspoon</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i4" class="ingredient"><span class="name">half-and-half</span><span class="amount">1 pint</span></td><td rowspan="7" data-node-id="o3" class="op"><span class="technique">combine</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i5" class="ingredient"><span class="name">whole milk</span><span class="amount">1 pint</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i6" class="ingredient"><span class="name">heavy cream</span><span class="amount">1 pint</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i7" class="ingredient"><span class="name">Jamaican rum</span><span class="amount">1 cup</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i8" class="ingredient"><span class="name">cognac</span><span class="amount">1 cup</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i9" class="ingredient"><span class="name">bourbon</span><span class="amount">1 cup</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i10" class="ingredient"><span class="name">kosher salt</span><span class="amount">1/4 teaspoon</span></td><td class="empty"></td></tr>
-</tbody>
-</table>
-    <table class="stats">
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>2409</td><td>830</td><td>$0.0066</td><td>4.1s</td><td>10</td><td>6</td><td>4</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>2903</td><td>950</td><td>$0.0230</td><td>7.2s</td><td>10</td><td>6</td><td>4</td></tr>
-        <tr><td>GPT-4o mini</td><td>1529</td><td>519</td><td>$0.0005</td><td>7.7s</td><td>10</td><td>5</td><td>3</td></tr>
-        <tr><td>GPT-4o</td><td>1529</td><td>606</td><td>$0.0099</td><td>4.0s</td><td>10</td><td>6</td><td>3</td></tr>
-        <tr><td>Gemini 3.5 Flash-Lite</td><td>1721</td><td>786</td><td>$0.0025</td><td>2.2s</td><td>11</td><td>6</td><td>4</td></tr>
-        <tr><td>Gemini 3.5 Flash</td><td>1721</td><td>739</td><td>$0.0092</td><td>31.6s</td><td>10</td><td>6</td><td>3</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="card">
-    <h2>Mac &amp; Cheese: Stove Top Mac-n-Cheese</h2>
-    <p class="tagline">Source: <a href="https://www.foodnetwork.com/recipes/alton-brown/stovetop-mac-n-cheese-recipe-1939465">Food Network (Alton Brown)</a></p>
-    <table class="gozinto">
-<tbody>
-<tr><td data-node-id="i1" class="ingredient"><span class="name">elbow macaroni</span><span class="amount">1/2 pound</span></td><td data-node-id="o1" class="op"><span class="technique">boil</span></td><td data-node-id="o2" class="op"><span class="technique">drain</span></td><td rowspan="2" data-node-id="o3" class="op"><span class="technique">melt in butter, toss</span></td><td rowspan="9" data-node-id="o5" class="op"><span class="technique">stir in</span><span class="detail">low heat, 3 min, until creamy</span></td></tr>
-<tr><td data-node-id="i2" class="ingredient"><span class="name">butter</span><span class="amount">4 tablespoons</span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i3" class="ingredient"><span class="name">eggs</span><span class="amount">2</span></td><td rowspan="6" data-node-id="o4" class="op"><span class="technique">whisk</span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i4" class="ingredient"><span class="name">evaporated milk</span><span class="amount">6 ounces</span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i5" class="ingredient"><span class="name">hot sauce</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i6" class="ingredient"><span class="name">kosher salt</span><span class="amount">1 teaspoon</span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i7" class="ingredient"><span class="name">fresh black pepper</span><span class="amount"></span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i8" class="ingredient"><span class="name">dry mustard</span><span class="amount">3/4 teaspoon</span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i9" class="ingredient"><span class="name">sharp cheddar, shredded</span><span class="amount">10 ounces</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-</tbody>
-</table>
-    <table class="stats">
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>2343</td><td>795</td><td>$0.0063</td><td>3.9s</td><td>9</td><td>6</td><td>3</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>2815</td><td>882</td><td>$0.0217</td><td>6.6s</td><td>9</td><td>5</td><td>3</td></tr>
-        <tr><td>GPT-4o mini</td><td>1456</td><td>472</td><td>$0.0005</td><td>6.2s</td><td>9</td><td>4</td><td>4</td></tr>
-        <tr><td>GPT-4o</td><td>1456</td><td>481</td><td>$0.0084</td><td>3.6s</td><td>9</td><td>4</td><td>3</td></tr>
-        <tr><td>Gemini 3.5 Flash-Lite</td><td>1643</td><td>640</td><td>$0.0021</td><td>1.9s</td><td>9</td><td>4</td><td>3</td></tr>
-        <tr><td>Gemini 3.5 Flash</td><td>1643</td><td>648</td><td>$0.0083</td><td>17.6s</td><td>9</td><td>5</td><td>3</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="card">
-    <h2>Potstickers: Pork Potstickers</h2>
-    <p class="tagline">Source: Damn Delicious</p>
-    <table class="gozinto">
-<tbody>
-<tr><td data-node-id="i1" class="ingredient"><span class="name">ground pork</span><span class="amount">1 pound</span></td><td rowspan="9" data-node-id="o1" class="op"><span class="technique">combine</span></td><td rowspan="10" data-node-id="o2" class="op"><span class="technique">fill</span></td><td rowspan="13" data-node-id="o3" class="op"><span class="technique">seal</span></td><td rowspan="13" data-node-id="o5" class="op"><span class="technique">pan-fry</span><span class="detail">2-3 min, until crisp on bottom</span></td><td rowspan="14" data-node-id="o6" class="op"><span class="technique">steam-cover</span><span class="detail">3-5 min, until liquid evaporated and bottoms crisp and golden</span></td><td rowspan="14" data-node-id="o7" class="op"><span class="technique">garnish and serve</span></td></tr>
-<tr><td data-node-id="i2" class="ingredient"><span class="name">green onions, thinly sliced</span><span class="amount">1 1/4 cups</span></td></tr>
-<tr><td data-node-id="i3" class="ingredient"><span class="name">fresh cilantro leaves, finely chopped</span><span class="amount">1/3 cup</span></td></tr>
-<tr><td data-node-id="i4" class="ingredient"><span class="name">garlic, minced</span><span class="amount">3 cloves</span></td></tr>
-<tr><td data-node-id="i5" class="ingredient"><span class="name">fresh ginger, grated</span><span class="amount">1 tablespoon</span></td></tr>
-<tr><td data-node-id="i6" class="ingredient"><span class="name">reduced sodium soy sauce</span><span class="amount">1 tablespoon</span></td></tr>
-<tr><td data-node-id="i7" class="ingredient"><span class="name">rice wine vinegar</span><span class="amount">1 tablespoon</span></td></tr>
-<tr><td data-node-id="i8" class="ingredient"><span class="name">chili garlic sauce</span><span class="amount">2 teaspoons</span></td></tr>
-<tr><td data-node-id="i9" class="ingredient"><span class="name">sesame oil</span><span class="amount">2 teaspoons</span></td></tr>
-<tr><td data-node-id="i10" class="ingredient"><span class="name">wonton wrappers, 3-inch round</span><span class="amount">32</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i11" class="ingredient"><span class="name">canola oil</span><span class="amount">2 tablespoons</span></td><td data-node-id="o4" class="op"><span class="technique">heat oil</span><span class="detail">medium heat</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i12" class="ingredient"><span class="name">sesame seeds</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i13" class="ingredient"><span class="name">water (for sealing wrappers)</span><span class="amount">as needed</span></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i14" class="ingredient"><span class="name">water (for steaming)</span><span class="amount">1/4 cup</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-</tbody>
-</table>
-    <table class="stats">
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>2571</td><td>1017</td><td>$0.0077</td><td>4.8s</td><td>13</td><td>6</td><td>5</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>3125</td><td>1288</td><td>$0.0287</td><td>8.9s</td><td>14</td><td>7</td><td>6</td></tr>
-        <tr><td>GPT-4o mini</td><td>1633</td><td>623</td><td>$0.0006</td><td>11.9s</td><td>12</td><td>5</td><td>4</td></tr>
-        <tr><td>GPT-4o</td><td>1633</td><td>671</td><td>$0.0108</td><td>4.4s</td><td>12</td><td>5</td><td>4</td></tr>
-        <tr><td>Gemini 3.5 Flash-Lite</td><td>1821</td><td>940</td><td>$0.0029</td><td>2.6s</td><td>14</td><td>6</td><td>5</td></tr>
-        <tr><td>Gemini 3.5 Flash</td><td>1821</td><td>939</td><td>$0.0112</td><td>31.4s</td><td>14</td><td>6</td><td>5</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="card">
-    <h2>Shredded Beef Tacos: Mexican Shredded Beef</h2>
-    <p class="tagline">Source: RecipeTin Eats (Nagi)</p>
-    <table class="gozinto">
-<tbody>
-<tr><td data-node-id="i1" class="ingredient"><span class="name">chipotle powder</span><span class="amount">1 1/2 tbsp</span></td><td rowspan="7" data-node-id="o1" class="op"><span class="technique">combine spice mix</span></td><td rowspan="9" data-node-id="o2" class="op"><span class="technique">sprinkle and pat</span><span class="detail">4 teaspoons of spice mix</span></td><td rowspan="9" data-node-id="o4" class="op"><span class="technique">brown beef</span><span class="detail">all sides, in batches</span></td><td rowspan="11" data-node-id="o5" class="op"><span class="technique">saute garlic and onion</span><span class="detail">medium heat, 3 min, until soft</span></td><td rowspan="13" data-node-id="o6" class="op"><span class="technique">deglaze</span><span class="detail">scrape brown bits into liquid</span></td><td rowspan="16" data-node-id="o7" class="op"><span class="technique">add and mix</span><span class="detail">remaining spice mix</span></td><td rowspan="16" data-node-id="o8" class="op"><span class="technique">return beef and simmer</span><span class="detail">lid on, bring to simmer then gentle bubble</span></td><td rowspan="16" data-node-id="o9" class="op"><span class="technique">simmer covered</span><span class="detail">2 hours</span></td><td rowspan="16" data-node-id="o10" class="op"><span class="technique">simmer uncovered</span><span class="detail">30 min, until tender enough to shred</span></td><td rowspan="16" data-node-id="o11" class="op"><span class="technique">remove and shred</span><span class="detail">with 2 forks</span></td><td rowspan="16" data-node-id="o12" class="op"><span class="technique">reduce sauce</span><span class="detail">simmer lid off, 10-15 min</span></td><td rowspan="17" data-node-id="o13" class="op"><span class="technique">season to taste</span></td><td rowspan="17" data-node-id="o14" class="op"><span class="technique">puree (optional)</span><span class="detail">with stick blender, for smooth texture</span></td><td rowspan="17" data-node-id="o15" class="op"><span class="technique">toss beef into sauce</span></td><td rowspan="17" data-node-id="o16" class="op"><span class="technique">transfer and serve</span></td><td rowspan="24" data-node-id="o17" class="op"><span class="technique">assemble tacos</span></td></tr>
-<tr><td data-node-id="i2" class="ingredient"><span class="name">paprika</span><span class="amount">1 tbsp</span></td></tr>
-<tr><td data-node-id="i3" class="ingredient"><span class="name">dried oregano</span><span class="amount">1 tbsp</span></td></tr>
-<tr><td data-node-id="i4" class="ingredient"><span class="name">All Spice powder</span><span class="amount">1 tsp</span></td></tr>
-<tr><td data-node-id="i5" class="ingredient"><span class="name">coriander powder</span><span class="amount">1 tsp</span></td></tr>
-<tr><td data-node-id="i6" class="ingredient"><span class="name">onion powder or garlic powder</span><span class="amount">2 tsp</span></td></tr>
-<tr><td data-node-id="i7" class="ingredient"><span class="name">salt and pepper</span><span class="amount">1 tsp each</span></td></tr>
-<tr><td data-node-id="i8" class="ingredient"><span class="name">olive oil</span><span class="amount">1-2 tbsp</span></td><td data-node-id="o3" class="op"><span class="technique">heat oil</span><span class="detail">high heat</span></td></tr>
-<tr><td data-node-id="i9" class="ingredient"><span class="name">beef chuck or brisket</span><span class="amount">3 lb / 1.5kg, cut into 4 pieces</span></td><td class="empty"></td></tr>
-<tr><td data-node-id="i10" class="ingredient"><span class="name">garlic</span><span class="amount">5 cloves, minced</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i11" class="ingredient"><span class="name">onion</span><span class="amount">1, diced</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i12" class="ingredient"><span class="name">orange juice</span><span class="amount">3/4 cup (185 ml)</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i13" class="ingredient"><span class="name">lime juice</span><span class="amount">2 tbsp</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i14" class="ingredient"><span class="name">crushed tomatoes</span><span class="amount">14 oz / 400g can</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i15" class="ingredient"><span class="name">beef or chicken broth/stock</span><span class="amount">2 cups (500 ml)</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i16" class="ingredient"><span class="name">water</span><span class="amount">1/2 cup (125ml)</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i17" class="ingredient"><span class="name">salt and pepper</span><span class="amount">to taste</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i18" class="ingredient"><span class="name">small tortillas</span><span class="amount">as needed</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i19" class="ingredient"><span class="name">avocado slices</span><span class="amount">as needed</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i20" class="ingredient"><span class="name">Pico de Gallo</span><span class="amount">as needed</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i21" class="ingredient"><span class="name">shredded cheese</span><span class="amount">as needed</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i22" class="ingredient"><span class="name">sour cream</span><span class="amount">as needed</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i23" class="ingredient"><span class="name">lime wedges</span><span class="amount">as needed</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i24" class="ingredient"><span class="name">cilantro/coriander leaves</span><span class="amount">extra, as needed</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-</tbody>
-</table>
-    <table class="stats">
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>3543</td><td>1579</td><td>$0.0114</td><td>8.1s</td><td>17</td><td>13</td><td>7</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>4441</td><td>2478</td><td>$0.0505</td><td>16.5s</td><td>24</td><td>17</td><td>11</td></tr>
-        <tr><td>GPT-4o mini</td><td>2461</td><td>1349</td><td>$0.0012</td><td>16.4s</td><td>24</td><td>14</td><td>8</td></tr>
-        <tr><td>GPT-4o</td><td>2461</td><td>1044</td><td>$0.0166</td><td>6.7s</td><td>16</td><td>11</td><td>7</td></tr>
-        <tr><td>Gemini 3.5 Flash-Lite</td><td>2695</td><td>1515</td><td>$0.0046</td><td>3.8s</td><td>17</td><td>13</td><td>7</td></tr>
-        <tr><td>Gemini 3.5 Flash</td><td>2695</td><td>1899</td><td>$0.0211</td><td>23.9s</td><td>25</td><td>13</td><td>10</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="card">
-    <h2>Tikka Masala: Instant Pot Chicken Tikka Masala</h2>
-    <p class="tagline">Source: Savory Tooth</p>
-    <table class="gozinto">
-<tbody>
-<tr><td colspan="8" data-node-id="o4" class="setup">preheat pressure cooker (sauté mode) &mdash; medium heat</td></tr>
-<tr><td data-node-id="i1" class="ingredient"><span class="name">boneless skinless chicken breasts</span><span class="amount">1 pound</span></td><td data-node-id="o2" class="op"><span class="technique">pat dry and cut</span></td><td rowspan="6" data-node-id="o3" class="op"><span class="technique">coat and marinate</span><span class="detail">refrigerate at least 1 hour</span></td><td rowspan="6" data-node-id="o5" class="op"><span class="technique">sauté chicken</span><span class="detail">about 5 minutes</span></td><td rowspan="13" data-node-id="o6" class="op"><span class="technique">add sauce ingredients and stir</span></td><td rowspan="13" data-node-id="o7" class="op"><span class="technique">pressure cook</span><span class="detail">high pressure, 10 min, then quick release</span></td><td rowspan="13" data-node-id="o8" class="op"><span class="technique">switch to sauté (low heat)</span><span class="detail">low heat</span></td><td rowspan="14" data-node-id="o9" class="op"><span class="technique">simmer with cream</span><span class="detail">a few minutes, until slightly thickened</span></td></tr>
-<tr><td data-node-id="i2" class="ingredient"><span class="name">plain greek yogurt</span><span class="amount">7-ounce container</span></td><td rowspan="5" data-node-id="o1" class="op"><span class="technique">stir together marinade</span></td></tr>
-<tr><td data-node-id="i3" class="ingredient"><span class="name">garam masala</span><span class="amount">1 tablespoon</span></td></tr>
-<tr><td data-node-id="i4" class="ingredient"><span class="name">fresh lemon juice</span><span class="amount">1 tablespoon</span></td></tr>
-<tr><td data-node-id="i5" class="ingredient"><span class="name">ground black pepper</span><span class="amount">1 teaspoon</span></td></tr>
-<tr><td data-node-id="i6" class="ingredient"><span class="name">ground ginger</span><span class="amount">1/4 teaspoon</span></td></tr>
-<tr><td data-node-id="i7" class="ingredient"><span class="name">tomato sauce</span><span class="amount">15-ounce can</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i8" class="ingredient"><span class="name">garlic, minced</span><span class="amount">5 cloves</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i9" class="ingredient"><span class="name">garam masala</span><span class="amount">4 teaspoons</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i10" class="ingredient"><span class="name">paprika</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i11" class="ingredient"><span class="name">turmeric</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i12" class="ingredient"><span class="name">table salt</span><span class="amount">1/2 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i13" class="ingredient"><span class="name">ground cayenne</span><span class="amount">1/4 teaspoon</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-<tr><td data-node-id="i14" class="ingredient"><span class="name">heavy whipping cream</span><span class="amount">1 cup</span></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
-</tbody>
-</table>
-    <table class="stats">
-      <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Haiku 4.5</td><td>2674</td><td>1172</td><td>$0.0085</td><td>5.3s</td><td>14</td><td>8</td><td>4</td></tr>
-        <tr class="primary"><td>Claude Sonnet 5</td><td>3307</td><td>1419</td><td>$0.0312</td><td>9.9s</td><td>14</td><td>9</td><td>5</td></tr>
-        <tr><td>GPT-4o mini</td><td>1715</td><td>657</td><td>$0.0007</td><td>8.4s</td><td>14</td><td>4</td><td>3</td></tr>
-        <tr><td>GPT-4o</td><td>1715</td><td>750</td><td>$0.0118</td><td>5.8s</td><td>14</td><td>6</td><td>4</td></tr>
-        <tr><td>Gemini 3.5 Flash-Lite</td><td>1905</td><td>956</td><td>$0.0030</td><td>2.4s</td><td>14</td><td>6</td><td>4</td></tr>
-        <tr><td>Gemini 3.5 Flash</td><td>1905</td><td>1003</td><td>$0.0119</td><td>22.7s</td><td>14</td><td>7</td><td>4</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <footer>Full pipeline, provider code, and example recipes: <a href="https://github.com/chodizzle/recipe_flowchart">github.com/chodizzle/recipe_flowchart</a>.</footer>
+  <footer>Full pipeline, eval tool, and write-up: <a href="https://github.com/chodizzle/recipe_flowchart">github.com/chodizzle/recipe_flowchart</a>.</footer>
 </main>
 </body>
 </html>
