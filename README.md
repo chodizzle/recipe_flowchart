@@ -1,5 +1,7 @@
 # Recipe Gozinto
 
+**[View the live site](https://chodizzle.github.io/recipe_flowchart/)**, with the full model comparison, the eval tool demo, and the worked example.
+
 This project turns a recipe into a **Gozinto chart**, an industrial-engineering diagram where ingredients flow through operations into a finished dish, read left to right. Structuring text like this used to mean writing parsing rules by hand. Now an LLM can just do it.
 
 The real question isn't whether a model can do that. It's how you check whether the output is right. There's no dataset of "correctly structured Gozinto charts" to grade against, only a domain expert's judgment: mine, since I was a chef before I became a data analyst.
