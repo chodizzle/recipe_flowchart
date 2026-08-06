@@ -67,10 +67,13 @@
 
   section.section { margin: 2.6rem 0; }
   section.section h2 { font-size: 1.4rem; }
-  .eval-media { display: flex; gap: 1.2rem; flex-wrap: wrap; align-items: flex-start; margin-top: 1rem; }
-  .eval-media video { max-width: 100%; width: 480px; border-radius: 8px; border: 1px solid var(--border); }
-  .eval-media .screenshots { display: flex; gap: 0.8rem; flex-wrap: wrap; }
-  .eval-media img { max-width: 220px; width: 100%; border-radius: 8px; border: 1px solid var(--border); }
+  .eval-media { display: flex; flex-direction: column; gap: 1.6rem; margin-top: 1rem; }
+  .eval-media video, .eval-media img { width: 100%; border-radius: 8px; border: 1px solid var(--border); display: block; }
+  .eval-media figcaption { color: var(--muted); font-size: 0.85rem; margin-top: 0.4rem; }
+  .eval-media figure { margin: 0; }
+  figure.before-after { margin: 0.9rem 0 0; }
+  figure.before-after img { width: 100%; max-width: 420px; border-radius: 8px; border: 1px solid var(--border); display: block; }
+  figure.before-after figcaption { color: var(--muted); font-size: 0.85rem; margin-top: 0.4rem; }
   .recipe-list { columns: 2; column-gap: 2rem; padding-left: 1.1rem; margin: 1rem 0; }
   .recipe-list li { break-inside: avoid; margin-bottom: 0.3rem; }
   @media (max-width: 640px) { .recipe-list { columns: 1; } }
@@ -89,11 +92,18 @@
     <h2>The eval tool</h2>
     <p>Every one of the 60 runs below was scored by hand against a fixed taxonomy (click a cell, tag why it's wrong, no free text) in a local tool built for exactly this. It isn't part of this static site &mdash; it writes real annotation data to disk, which a GitHub Pages site can't do &mdash; so here's what it looks like in use instead.</p>
     <div class="eval-media">
-      <video src="media/eval_demo.mp4" controls preload="metadata"></video>
-      <div class="screenshots">
+      <figure>
+        <video src="media/eval_demo.mp4" controls preload="metadata"></video>
+        <figcaption>Scoring a run: click a cell, pick from the fixed taxonomy, move on.</figcaption>
+      </figure>
+      <figure>
         <img src="media/eval_1.png" alt="Eval tool: recipe source next to the rendered Gozinto chart, click-to-tag interface">
+        <figcaption>Recipe source and rendered Gozinto side by side, each scrolling independently.</figcaption>
+      </figure>
+      <figure>
         <img src="media/eval_2.png" alt="Eval tool: tag popover open on a flagged cell, showing the taxonomy and the resolved raw inputs">
-      </div>
+        <figcaption>The tag popover, with the clicked cell's actual inputs resolved right there &mdash; so a flag is checkable against real data, not guessed at from the rendering.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -104,6 +114,10 @@
   <section class="card">
     <h2>Handwritten: Choux au Craquelin</h2>
     <p class="tagline">Source: My own kitchen notes (bilingual shorthand, hand-drawn dependency brackets)</p>
+    <figure class="before-after">
+      <img src="media/showcase_original.jpg" alt="Original source: Handwritten">
+      <figcaption>The original &mdash; what the model actually saw.</figcaption>
+    </figure>
     <table class="gozinto">
 <tbody>
 <tr><td data-node-id="i1" class="ingredient"><span class="name">brown sugar</span><span class="amount">115g</span></td><td rowspan="2" data-node-id="o1" class="op"><span class="technique">cream</span></td><td rowspan="4" data-node-id="o2" class="op"><span class="technique">mix until crumbly</span></td><td rowspan="4" data-node-id="o3" class="op"><span class="technique">press into rectangle</span><span class="detail">6x8 rectangle</span></td><td rowspan="4" data-node-id="o4" class="op"><span class="technique">roll out and freeze</span><span class="detail">12x14, 1/8 inch, freeze 5 min</span></td><td rowspan="4" data-node-id="o5" class="op"><span class="technique">cut rounds</span><span class="detail">18x 2 inch rounds</span></td><td rowspan="10" data-node-id="o9" class="op"><span class="technique">pipe and top with craquelin</span></td><td rowspan="10" data-node-id="o10" class="op"><span class="technique">bake</span><span class="detail">400F, 10-12 min</span></td><td rowspan="10" data-node-id="o11" class="op"><span class="technique">rest with oven off and door open</span><span class="detail">30 min</span></td></tr>

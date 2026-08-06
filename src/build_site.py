@@ -160,7 +160,7 @@ def render_html(all_results: list[tuple[dict, list[tuple[str, ExtractionResult]]
     by_id = {recipe["id"]: (recipe, results) for recipe, results in all_results}
 
     showcase_recipe, showcase_results = by_id[SHOWCASE_RECIPE_ID]
-    showcase_card = _render_recipe_card(showcase_recipe, showcase_results)
+    showcase_card = _render_recipe_card(showcase_recipe, showcase_results, original_media=_showcase_original_name(showcase_recipe))
 
     recipe_list = _render_recipe_list(all_results)
     model_rollup = _render_model_rollup(all_results)
@@ -181,7 +181,17 @@ def _node_counts(nodes: list[dict]) -> tuple[int, int, int]:
     return n_ingredients, len(operations), n_merges
 
 
-def _render_recipe_card(recipe: dict, results: list[tuple[str, ExtractionResult]]) -> str:
+def _showcase_original_name(recipe: dict) -> str | None:
+    """Filename (under docs/media/) for the showcase recipe's own source image, if it has
+    one -- lets the worked example show a before/after rather than just the rendered
+    result. None for a text-input recipe, since there's no equivalent image to show."""
+    suffix = recipe["input"].suffix.lower()
+    return f"showcase_original{suffix}" if suffix in {".jpg", ".jpeg", ".png"} else None
+
+
+def _render_recipe_card(
+    recipe: dict, results: list[tuple[str, ExtractionResult]], original_media: str | None = None
+) -> str:
     primary = next((r for label, r in results if label == PRIMARY_LABEL), results[-1][1])
     table = to_table_html(primary.nodes)
     # A model occasionally drops the required `title` field on large outputs (see README);
@@ -192,11 +202,19 @@ def _render_recipe_card(recipe: dict, results: list[tuple[str, ExtractionResult]
         if recipe["source_url"]
         else html.escape(recipe["source"])
     )
+    original_block = (
+        f'\n    <figure class="before-after">\n'
+        f'      <img src="media/{html.escape(original_media)}" alt="Original source: {html.escape(recipe["label"])}">\n'
+        f'      <figcaption>The original &mdash; what the model actually saw.</figcaption>\n'
+        f"    </figure>"
+        if original_media
+        else ""
+    )
     rows = "\n".join(_render_table_row(label, r) for label, r in results)
     return f"""
   <section class="card">
     <h2>{html.escape(recipe["label"])}: {html.escape(title)}</h2>
-    <p class="tagline">Source: {source_line}</p>
+    <p class="tagline">Source: {source_line}</p>{original_block}
     {table}
     <table class="stats">
       <thead><tr><th>Model</th><th>Input tok</th><th>Output tok</th><th>Cost</th><th>Latency</th><th>Ingredients</th><th>Operations</th><th>Merges</th></tr></thead>
@@ -351,10 +369,13 @@ _PAGE_TEMPLATE = """<!doctype html>
 
   section.section {{ margin: 2.6rem 0; }}
   section.section h2 {{ font-size: 1.4rem; }}
-  .eval-media {{ display: flex; gap: 1.2rem; flex-wrap: wrap; align-items: flex-start; margin-top: 1rem; }}
-  .eval-media video {{ max-width: 100%; width: 480px; border-radius: 8px; border: 1px solid var(--border); }}
-  .eval-media .screenshots {{ display: flex; gap: 0.8rem; flex-wrap: wrap; }}
-  .eval-media img {{ max-width: 220px; width: 100%; border-radius: 8px; border: 1px solid var(--border); }}
+  .eval-media {{ display: flex; flex-direction: column; gap: 1.6rem; margin-top: 1rem; }}
+  .eval-media video, .eval-media img {{ width: 100%; border-radius: 8px; border: 1px solid var(--border); display: block; }}
+  .eval-media figcaption {{ color: var(--muted); font-size: 0.85rem; margin-top: 0.4rem; }}
+  .eval-media figure {{ margin: 0; }}
+  figure.before-after {{ margin: 0.9rem 0 0; }}
+  figure.before-after img {{ width: 100%; max-width: 420px; border-radius: 8px; border: 1px solid var(--border); display: block; }}
+  figure.before-after figcaption {{ color: var(--muted); font-size: 0.85rem; margin-top: 0.4rem; }}
   .recipe-list {{ columns: 2; column-gap: 2rem; padding-left: 1.1rem; margin: 1rem 0; }}
   .recipe-list li {{ break-inside: avoid; margin-bottom: 0.3rem; }}
   @media (max-width: 640px) {{ .recipe-list {{ columns: 1; }} }}
@@ -373,11 +394,18 @@ _PAGE_TEMPLATE = """<!doctype html>
     <h2>The eval tool</h2>
     <p>Every one of the 60 runs below was scored by hand against a fixed taxonomy (click a cell, tag why it's wrong, no free text) in a local tool built for exactly this. It isn't part of this static site &mdash; it writes real annotation data to disk, which a GitHub Pages site can't do &mdash; so here's what it looks like in use instead.</p>
     <div class="eval-media">
-      <video src="media/eval_demo.mp4" controls preload="metadata"></video>
-      <div class="screenshots">
+      <figure>
+        <video src="media/eval_demo.mp4" controls preload="metadata"></video>
+        <figcaption>Scoring a run: click a cell, pick from the fixed taxonomy, move on.</figcaption>
+      </figure>
+      <figure>
         <img src="media/eval_1.png" alt="Eval tool: recipe source next to the rendered Gozinto chart, click-to-tag interface">
+        <figcaption>Recipe source and rendered Gozinto side by side, each scrolling independently.</figcaption>
+      </figure>
+      <figure>
         <img src="media/eval_2.png" alt="Eval tool: tag popover open on a flagged cell, showing the taxonomy and the resolved raw inputs">
-      </div>
+        <figcaption>The tag popover, with the clicked cell's actual inputs resolved right there &mdash; so a flag is checkable against real data, not guessed at from the rendering.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -432,8 +460,14 @@ def main(use_cache: bool = True) -> None:
 
 def _copy_media() -> None:
     """GitHub Pages serves only from docs/, so the eval-tool demo assets have to live
-    there too, not just in the repo-root screenshots/ folder they're recorded into."""
+    there too, not just in the repo-root screenshots/ folder they're recorded into.
+    Also copies the showcase recipe's own source image, if it has one, for the
+    worked-example before/after."""
     MEDIA_DIR.mkdir(exist_ok=True)
+    showcase_recipe = next(r for r in RECIPES if r["id"] == SHOWCASE_RECIPE_ID)
+    original_name = _showcase_original_name(showcase_recipe)
+    if original_name:
+        shutil.copy(showcase_recipe["input"], MEDIA_DIR / original_name)
     for name in ("eval_demo.mp4", "eval_1.png", "eval_2.png"):
         src = SCREENSHOTS_DIR / name
         if src.exists():
